@@ -1,1 +1,4 @@
 random_player
+*.pyc
+__pycache__
+*.log
