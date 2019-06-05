@@ -1,8 +1,8 @@
 import sys
 
-from LogicalBoard import *
-from GraphicalBoard import *
-from constants import *
+from LogicalBoard import LogicalBoard
+from GraphicalBoard import GraphicalBoard
+from constants import WIN, LOSE, TIE, EXIT
 
 
 class Referee:
@@ -19,7 +19,8 @@ class Referee:
         else:
             self.graphicalBoard = None
 
-        assert self.graphicalBoard is not None or (not player1.human and not player2.human)
+        assert self.graphicalBoard is not None or (not player1.human
+                                                   and not player2.human)
 
     def runPlay(self, first_player):
 
@@ -56,13 +57,16 @@ class Referee:
                 oponent = self.player1
 
             # make the player move
-            if player.human:  # if human playing graphical board exists, previously checked by the __init__ assert
+            if player.human:
+                # if human playing graphical board exists, previously checked
+                # by the __init__ assert
                 self.last_move = self.graphicalBoard.getHumanMove(player.color)
                 self.check_exit(self.last_move)
             else:
                 column = player.move(self.last_move)
                 if self.graphicalBoard is not None:
-                    self.graphicalBoard.animateComputerMove(column, player.color)
+                    self.graphicalBoard.animateComputerMove(column,
+                                                            player.color)
                 else:
                     self.logicalBoard.makeMove(player.color, column)
                 self.last_move = column
@@ -78,7 +82,8 @@ class Referee:
                 player.finished(LOSE)
                 oponent.finished(WIN)
                 break
-            elif self.logicalBoard.isBoardFull() or not self.logicalBoard.availableMoves():
+            elif self.logicalBoard.isBoardFull() \
+                    or not self.logicalBoard.availableMoves():
                 winner = TIE
                 player.finished(TIE)
                 oponent.finished(TIE)

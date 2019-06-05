@@ -1,6 +1,11 @@
 from subprocess import Popen, PIPE
-from constants import *
+from constants import YOU_FIRST, HE_FIRST, EXIT
 import os
+from sys import version_info
+
+popen_py3args = {}
+if version_info >= (3, 0):
+    popen_py3args['encoding'] = 'utf8'
 
 
 class PlayerCommunicator:
@@ -9,11 +14,13 @@ class PlayerCommunicator:
         self.human = False
         self.color = color
         self.oponent_color = oponent_color
-        self.player_process = Popen([player] + params, shell=False, stdout=PIPE, stdin=PIPE)
+        self.player_process = Popen([player] + params, shell=False,
+                                    stdout=PIPE, stdin=PIPE, **popen_py3args)
 
         if not os.path.isdir('log'):
             os.mkdir('log')
-        self.log_file = open('log/player_communicator_' + self.color + '.log', 'a')
+        self.log_file = open('log/player_communicator_' + self.color + '.log',
+                             'a')
 
     def startGame(self, columns, rows, c, p, go_first):
         self.log('\n/*************** Nueva partida *****************/' +

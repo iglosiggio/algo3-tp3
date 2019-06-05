@@ -1,11 +1,11 @@
 import sys
 import os
-from RandomPlayer_test import *
-from constants import *
+from RandomPlayer_test import RandomPlayer_test
+from constants import EXIT, LISTO, YOU_FIRST, LOSE, WIN, TIE
 
 
 def read(type):
-    msg = raw_input()
+    msg = input()
     if msg == EXIT:
         send(LISTO)
         sys.exit()
@@ -27,10 +27,12 @@ def main():
         board = read(str)
         board = board.split(' ')
         board = map(lambda x: int(x), board)
-        log.write("Dimensiones: " + str(board[0]) + " x " + str(board[1]) + '\n')
+        log.write("Dimensiones: " + str(board[0]) + " x " + str(board[1])
+                  + '\n')
         log.write("c: " + str(board[2]) + " p: " + str(board[3]) + '\n')
 
-        player = RandomPlayer_test(colors[0], colors[1], board[0], board[1], board[2], board[3], float(sys.argv[1]))
+        player = RandomPlayer_test(colors[0], colors[1], board[0], board[1],
+                                   board[2], board[3], float(sys.argv[1]))
 
         go_first = read(str)
         if go_first == YOU_FIRST:

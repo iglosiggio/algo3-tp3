@@ -1,4 +1,4 @@
-from constants import *
+from constants import EMPTY
 
 
 class LogicalBoard:
@@ -27,7 +27,8 @@ class LogicalBoard:
 
         # Returns True if there is an empty space in the given column.
         # Otherwise returns False.
-        if column < 0 or column >= (self.columns) or self.board[column][0] != EMPTY:
+        if column < 0 or column >= (self.columns) \
+                or self.board[column][0] != EMPTY:
             return False
         return True
 
@@ -69,12 +70,14 @@ class LogicalBoard:
         # check / diagonal spaces
         for x in range(self.columns - self.c + 1):
             for y in range(self.c - 1, self.rows):
-                if all([self.board[x + i][y - i] == tile for i in range(self.c)]):
+                if all([self.board[x + i][y - i] == tile
+                        for i in range(self.c)]):
                     return True
         # check \ diagonal spaces
         for x in range(self.columns - self.c + 1):
             for y in range(self.rows - self.c + 1):
-                if all([self.board[x + i][y + i] == tile for i in range(self.c)]):
+                if all([self.board[x + i][y + i] == tile
+                        for i in range(self.c)]):
                     return True
         return False
 
