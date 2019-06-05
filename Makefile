@@ -8,4 +8,4 @@ clean:
 	$(MAKE) -C src clean
 	rm -f tags
 
-.PHONY: clean all
+.PHONY: clean all tags
