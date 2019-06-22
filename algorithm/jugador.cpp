@@ -12,7 +12,6 @@ using namespace std;
 std::random_device rd;
 std::mt19937 generator(rd());
 
-//0 significa no hay ficha, 1 significa la ficha es mia, 2 significa la fichja es del enemigo
 using Tablero = vector<vector<int>>;
 using Fichas = vector<int>;
 
@@ -338,15 +337,17 @@ int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int m, int n, i
 
 }
 
-int evaluarTableros(Tablero tablero, Fichas fichas, int columns, int rows, int c, int p, int player){
+int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player) {
 
+    int columns = fichas.size();
+    int rows = tablero[0].size();
     int mejorPuntaje = 0;
     int mejorCol;
     
-    for(int col = 0; col < columns; col++) {
+    for(int col = 0; col < fichas.size(); col++) {
 
         if(fichas[col] < rows){
-            tablero[fichas[col]][col] = 1;
+            tablero[fichas[col]][col] = player;
             int puntaje = puntuarJugada(tablero, fichas, col, columns, rows, c, p, player);
 
             cerr << "col: " << col << " puntaje: " << puntaje << endl;
@@ -384,7 +385,7 @@ int main() {
 
         msg = read_str();
         if (msg == "vos") {
-            int col = evaluarTableros(tablero, fichas, columns, rows, c, p, 1);
+            int col = evaluarTableros(tablero, fichas, c, p, 1);
             tablero[0][col] = 1;
             fichas[col]++;
             send(col);
@@ -400,7 +401,7 @@ int main() {
             fichas[colOponent]++;
             
             
-            int col = evaluarTableros(tablero, fichas, columns, rows, c, p, 1);
+            int col = evaluarTableros(tablero, fichas, c, p, 1);
             tablero[fichas[col]][col] = 1;
             fichas[col]++;
             send(col);
