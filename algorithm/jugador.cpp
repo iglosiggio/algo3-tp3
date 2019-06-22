@@ -339,12 +339,12 @@ int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int m, int n, i
 
 int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player) {
 
-    int columns = fichas.size();
-    int rows = tablero[0].size();
+    int columns = tablero[0].size();
+    int rows = tablero.size();
     int mejorPuntaje = 0;
     int mejorCol;
     
-    for(int col = 0; col < fichas.size(); col++) {
+    for(int col = 0; col < columns; col++) {
 
         if(fichas[col] < rows){
             tablero[fichas[col]][col] = player;
