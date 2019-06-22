@@ -73,7 +73,7 @@ std::string read_str() {
 }
 
 
-int puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+void puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
     int contadorEfectivo = 0;
     int contadorPosibles = 0;
@@ -124,7 +124,7 @@ int puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int 
 
 
 
-int puntuarVertical(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+void puntuarVertical(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
     int contadorEfectivo = 0;
     int contadorPosibles = 0;
@@ -170,7 +170,7 @@ int puntuarVertical(Tablero tablero, Fichas fichas, int coljugada, int m, int n,
 }
 
 
-int puntuarDiagSE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+void puntuarDiagSE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
     int contadorEfectivo = 0;
     int contadorPosibles = 0;
@@ -225,7 +225,7 @@ int puntuarDiagSE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, i
     }
 }
 
-int puntuarDiagNE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+void puntuarDiagNE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
     int contadorEfectivo = 0;
     int contadorPosibles = 0;
