@@ -1,4 +1,46 @@
-#include "jugador.cpp"
+#include <iostream>
+
+#include "jugador.h"
+
+void send(const std::string& msg) {
+    std::cout << msg << std::endl;
+}
+
+void send(int msg) {
+    std::cout << msg << std::endl;
+}
+
+int read_int() {
+    std::string msg;
+    std::cin >> msg;
+    if (msg == "salir") {
+        send("listo");
+        std::exit(0);
+    }
+    return std::stoi(msg);
+}
+
+std::string read_str() {
+    std::string msg;
+    std::cin >> msg;
+    if (msg == "salir") {
+        send("listo");
+        std::exit(0);
+    }
+    return msg;
+}
+
+struct scores greedy_conf {
+	.posc2 = 10,
+	.posc1 = 15,
+	.posc = 20,
+	.c2 = 100,
+	.c1 = 300,
+	.c = 10000,
+	.bloqueos_c3 = 20,
+	.bloqueos_c2 = 200,
+	.bloqueos_c1 = 3000
+};
 
 int main() {
 
@@ -22,7 +64,7 @@ int main() {
 
         msg = read_str();
         if (msg == "vos") {
-            int col = evaluarTableros(tablero, fichas, c, p, 1);
+            int col = evaluarTableros(tablero, fichas, c, p, 1, &greedy_conf);
             tablero[0][col] = 1;
             fichas[col]++;
             send(col);
@@ -38,7 +80,7 @@ int main() {
             fichas[colOponent]++;
             
             
-            int col = evaluarTableros(tablero, fichas, c, p, 1);
+            int col = evaluarTableros(tablero, fichas, c, p, 1, &greedy_conf);
             tablero[fichas[col]][col] = 1;
             fichas[col]++;
             send(col);

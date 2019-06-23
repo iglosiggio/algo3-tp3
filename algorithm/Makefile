@@ -9,8 +9,8 @@ BIN=jugador
 
 all: jugador
 
-jugador: main.cpp
-	$(CC) $(CFLAGS) $< -o jugador
+jugador: main.cpp jugador.o
+	$(CC) $(CFLAGS) $^ -o jugador
 
 clean:
 	rm -f $(OBJS)

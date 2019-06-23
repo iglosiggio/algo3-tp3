@@ -41,20 +41,21 @@ static inline bool hay_ganador(const Tablero& t, int c) {
 
 #include <iostream>
 
-int juez(int cols, int rows, int c, int p, Jugador primero, Jugador segundo) {
+int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
+	 Jugador segundo, const void* ctx2) {
 	Tablero partida(cols, vector<int>(rows, 0));
 	Fichas fichas(cols, 0);
 
 	for (int i = 0; i < p; i++) {
 		int jugada;
 	       
-		jugada = primero(partida, fichas, c, p, 1);
+		jugada = primero(partida, fichas, c, p, 1, ctx1);
 		partida[fichas[jugada]][jugada] = 1;
 		fichas[jugada]++;
 		if (hay_ganador(partida, c))
 			return 1;
 
-		jugada = primero(partida, fichas, c, p, 2);
+		jugada = primero(partida, fichas, c, p, 2, ctx2);
 		partida[fichas[jugada]][jugada] = 2;
 		fichas[jugada]++;
 		if (hay_ganador(partida, c))

@@ -10,11 +10,13 @@ using std::vector;
 using Tablero = vector<vector<int>>;
 using Fichas = vector<int>;
 
-using Jugador = int (*)(Tablero, Fichas, int c, int p, int player);
+using Jugador = int (*)(Tablero, Fichas, int c, int p, int player,
+			const void* ctx);
 
 /* 0 es empate
  * 1 es ganó el primero
  * 2 es ganó el segundo */
-int juez(int cols, int rows, int c, int p, Jugador primero, Jugador segundo);
+int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
+	 Jugador segundo, const void* ctx2);
 
 #endif

@@ -1,33 +1,6 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <random>
-#include <cstdlib>
-#include <vector>
-#include <stdio.h>
-#include <sys/stat.h>
 
-using namespace std;
-
-std::random_device rd;
-std::mt19937 generator(rd());
-
-using Tablero = vector<vector<int>>;
-using Fichas = vector<int>;
-
-int SCORE_POSC2 = 10;
-int SCORE_POSC1 = 15;
-int SCORE_POSC = 20;
-
-int SCORE_C2 = 100;
-int SCORE_C1 = 300;
-int SCORE_C = 10000;
-
-int SCORE_BLOQUEOS_C3 = 20;
-int SCORE_BLOQUEOS_C2 = 200;
-int SCORE_BLOQUEOS_C1 = 3000;
-
-int SCORE_C_BLOCK = SCORE_C / 3;
+#include "jugador.h"
 
 int posiblesC2;
 int posiblesC1;
@@ -40,35 +13,6 @@ int efectivosC;
 int bloqueosC3;
 int bloqueosC2;
 int bloqueosC1;
-
-void send(const std::string& msg) {
-    std::cout << msg << std::endl;
-}
-
-void send(int msg) {
-    std::cout << msg << std::endl;
-}
-
-int read_int() {
-    std::string msg;
-    std::cin >> msg;
-    if (msg == "salir") {
-        send("listo");
-        std::exit(0);
-    }
-    return std::stoi(msg);
-}
-
-std::string read_str() {
-    std::string msg;
-    std::cin >> msg;
-    if (msg == "salir") {
-        send("listo");
-        std::exit(0);
-    }
-    return msg;
-}
-
 
 void puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
@@ -118,8 +62,6 @@ void puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int
         }
     }
 }
-
-
 
 void puntuarVertical(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
 
@@ -275,46 +217,24 @@ void puntuarDiagNE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, 
 }
 
 
-int score(Tablero tablero, Fichas fichas){
+int score(Tablero tablero, Fichas fichas, const struct scores* scores) {
     int score = 0;
-
-        /*
-        cerr << "     " << endl;
-        cerr << "------" << endl;
-
-        cerr << "matrix" << endl;
-
-        for(int i= 0; i < tablero.size(); i++){
-            for(int j= 0; j < tablero[0].size(); j++){
-                cerr << tablero[i][j];
-            }
-            cerr << endl;
-        }
-
-    
-        cerr << "------" << endl;
-        cerr << "posiblesC2: " << posiblesC2 << endl;
-        cerr << "posiblesC1: " << posiblesC1 << endl;
-        cerr << "posiblesC: " << posiblesC << endl;
-        cerr << "efectivosC2: " << efectivosC2 << endl;
-        cerr << "efectivosC1: " << efectivosC1 << endl;
-        cerr << "efectivosC: " << efectivosC << endl;
-        cerr << "------" << endl;
-        cerr << "     " << endl;
-        */    
-    score += SCORE_POSC2 * posiblesC2;
-    score += SCORE_POSC1 * posiblesC1;
-    score += SCORE_POSC * posiblesC;
-    score += SCORE_C2 * efectivosC2;
-    score += SCORE_C1 * efectivosC1;
-    score += SCORE_C * efectivosC;
-    score += SCORE_BLOQUEOS_C3 * bloqueosC3;
-    score += SCORE_BLOQUEOS_C2 * bloqueosC2;
-    score += SCORE_BLOQUEOS_C1 * bloqueosC1;
+    score += scores->posc2 * posiblesC2;
+    score += scores->posc1 * posiblesC1;
+    score += scores->posc * posiblesC;
+    score += scores->c2 * efectivosC2;
+    score += scores->c1 * efectivosC1;
+    score += scores->c * efectivosC;
+    score += scores->bloqueos_c3 * bloqueosC3;
+    score += scores->bloqueos_c2 * bloqueosC2;
+    score += scores->bloqueos_c1 * bloqueosC1;
     return score;
 }
 
-int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int c, int p,
+		  int player, const struct scores* scores) {
+    int m = tablero[0].size();
+    int n = tablero.size();
     posiblesC2 = 0;
     posiblesC1 = 0;
     posiblesC = 0;
@@ -331,11 +251,12 @@ int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int m, int n, i
     puntuarDiagSE(tablero, fichas, coljugada, m, n, c, p, player);
     puntuarDiagNE(tablero, fichas, coljugada, m, n, c, p, player);
 
-    return score(tablero, fichas);
+    return score(tablero, fichas, scores);
 
 }
 
-int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player) {
+int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
+		    const void* ctx) {
 
     int columns = tablero[0].size();
     int rows = tablero.size();
@@ -346,9 +267,11 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player) {
 
         if(fichas[col] < rows){
             tablero[fichas[col]][col] = player;
-            int puntaje = puntuarJugada(tablero, fichas, col, columns, rows, c, p, player);
+            int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
+					(const struct scores*) ctx);
 
-            cerr << "col: " << col << " puntaje: " << puntaje << endl;
+	    std::cerr << "col: " << col
+		      << " puntaje: " << puntaje << std::endl;
             if(mejorPuntaje < puntaje){
                 mejorPuntaje = puntaje;
                 mejorCol = col;
