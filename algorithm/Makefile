@@ -9,7 +9,7 @@ BIN=jugador
 
 all: jugador
 
-jugador: jugador.cpp
+jugador: main.cpp
 	$(CC) $(CFLAGS) $< -o jugador
 
 clean:
