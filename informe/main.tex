@@ -1,0 +1,272 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel} 
+\usepackage{a4wide} 
+\usepackage{caratula}
+\usepackage{afterpage}
+\usepackage{hyperref}
+\usepackage{xfrac}
+\usepackage{xspace}
+\usepackage{xargs}
+\usepackage{xcolor}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{graphbox}
+\usepackage{caption}
+\usepackage{hhline}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{subcaption} 
+\usepackage{ifthen}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{algorithmicx, algpseudocode, algorithm}
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%--------Extension del package algorithms para que los algoritmos puedan cruzar la pagina---------
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{flushleft}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{flushleft}
+  }
+\makeatother
+
+
+%/////////////////////////////////////////////////////////////////////////////////////////////////
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%-------------------------------------Configuración de páginas------------------------------------
+
+\geometry{
+ a4paper,
+ left=20mm,
+ right=20mm,
+ top=20mm,
+ bottom=20mm,
+}
+
+%/////////////////////////////////////////////////////////////////////////////////////////////////
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\begin{document}
+
+\titulo{Trabajo Práctico 3}
+\subtitulo{Darwin en línea}
+
+\fecha{Jueves 27 de junio de 2019}
+
+\materia{Algoritmos y Estructuras de Datos III}
+
+
+\integrante{Lucas M. Soltz}{205/17}{lucas.m.soltz@gmail.com}
+\integrante{Federico A. Sabatini}{NNN/YY}{------}
+\integrante{Ignacio E. Losiggio}{NNN/YY}{------}
+\integrante{Tomás Capdevielle}{245/17}{tomas.capdevielle@gmail.com}
+
+\maketitle
+
+\thispagestyle{empty}
+\tableofcontents
+\clearpage
+\setcounter{page}{1}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Trabajo Práctico 3}
+\lhead{Algoritmos y Estructuras de Datos III}
+\rfoot{\centering \thepage}
+
+
+
+\section{Introducción}
+
+% TODO: Tiene sentido plantear ejemplos y soluciones como en los otros TPs?
+
+En este Trabajo, se pretende poner en práctica los conceptos sobre heurísticas y metaheurísticas estudiados en la materia. Para ello, se trabajará sobre un área vastamente explorada en la reciente historia de la computación: la resolución de juegos, como pueden ser el ajedrez, las damas, entre otros, a través del uso de una computadora. En este caso, se centrará la atención en el \textit{C en línea}, un juego propuesto por la cátedra para este Trabajo, y que es, esencialmente, una generalización del clásico \textit{4 en línea}. Es decir, el juego consta de un tablero de $N$ columnas y $M$ filas, y dos jugadores (\textit{azul} y \textit{rojo}) que se enfrentan, por turnos alternados, para intentar conseguir que $C$ de sus fichas queden alineadas (ya sea de manera horizontal, vertical o diagonal) en el tablero.
+
+Así, el objetivo es implementar \textit{jugadores razonablemente buenos} de \textit{C en línea} que sean capaces de analizar el tablero de juego en un instante dado, y determinar cuál es la mejor jugada que se puede efectuar. Para esto, se deberá implementar un algoritmo de heurística golosa, utilizando una \textit{función parametrizable} que evalúe el estado del tablero para decidir la próxima jugada a realizar. Esto significa que se deberá considerar cuáles son los aspectos más relevantes a tener en cuenta para efectuar una jugada óptima en el \textit{C en línea}, y luego asignar a cada uno de estos \textit{parámetros} un \textit{peso} para calcular un valor numérico que represente qué tan buena es una cierta jugada, y así poder determinar cuál es la mejor.
+
+Dichos parámetros serán posteriormente optimizados, utilizando dos técnicas distintas, que serán debidamente explicadas en secciones posteriores.
+\begin{itemize}
+    \item Una heurística de búsqueda local basada en \textit{grid-search}.
+    \item Una metaheurística basada en un algoritmo genético.
+\end{itemize}
+
+La idea es que, a partir de las optimizaciones introducidas por estas dos soluciones, se obtengas dos jugadores de \textit{4 en línea}, que sean capaces de ganar a los jugadores provistos por la cátedra de manera consistente. La capacidad de los jugadores implementados será evaluada en la sección de Experimentación de este informe.
+
+Resulta interesante observar que el clásico juego del \textit{Ta-Te-Tí} es una instancia particular del \textit{C en línea} (donde $N = 3$, $M = 3$, $C = 3$), pero sin la restricción dada por la gravedad a la hora de colocar una ficha en el tablero. Esto es, en el \textit{C en línea} la ficha de un jugador caerá a la primera posición desocupada del tablero en una cierta columna elegida del mismo, a diferencia de lo que ocurre en el \textit{Ta-Te-Tí}, donde los jugadores pueden colocar sus fichas en cualquiera de las posiciones del tablero. Sin embargo, a pesar de esta diferencia, resultará útil tener en cuenta las consideraciones vistas en clase para diseñar un buen jugador de \textit{Ta-Te-Tí}, a la hora de implementar los algoritmos de este Trabajo.
+
+Sea como fuere, en este informe se documentará el proceso de la implementación realizada, explicando la elección de los parámetros a considerar, y las dos técnicas de optimización utilizadas. A su vez, se hará referencia a los métodos usados para evaluar qué tan bueno es un jugador respecto a otro, y se mostrarán los resultados obtenidos a partir de experimentación. Por último, en la última sección se mencionarán las conclusiones a las que se haya podido arribar luego del Trabajo.
+
+\newpage
+
+
+%----------------------------------------------------------------------------------------------------------
+
+
+\section{Heurística Golosa}
+
+
+	
+	\subsection{Evaluando el tablero}
+		
+    Como ya se mencionó en la Introducción, el algoritmo implementado se encargará de decidir, dado un cierto estado del tablero, cuál es la mejor jugada a ejecutar. Para esto, se representa el tablero como una matriz de casilleros, donde cada casillero tiene tres estados posibles en un instante determinado: puede estar vacío, tener una ficha del jugador azul, o una del jugador rojo. A su vez, el algoritmo deberá tener en cuenta cuál es la primera posición libre en cada columna del tablero, ya que, por efecto de la gravedad, las fichas se pueden colocar en una única posición posible en cada columna, en un turno dado.
+    
+    Dicho esto, los parámetros considerados para evaluar un estado del tablero fueron elegidos pensando en que el jugador implementado debe analizar la posibilidad de que, al efectuar su jugada, pueda ganar la partida, o quedar razonablemente cerca de ganarla; a su vez, también debe tener en cuenta si su movimiento en el turno actual provocará que su oponente pueda ganar la partida en su turno. Entonces, la idea es asignar a cada columna del tablero (notar que hay una jugada posible en cada columna, por lo explicado antes sobre la gravedad) una cierta puntuación numérica, de acuerdo a como se presenten los diferentes parámetros elegidos en caso de efectuar la jugada en dicha columna.
+    
+    Entonces, la forma en la que el jugador implementado evalúa el tablero consiste en simular la jugada para cada columna del tablero, y evaluar el estado del tablero luego de efectuar esa hipotética jugada (función \texttt{puntuarJugada}). Luego, el algoritmo retorna el número de la columna que obtuvo el mejor tablero. Esto se puede ver en el siguiente pseudocódigo:
+    
+    \begin{breakablealgorithm}{\textbf{evaluarTableros}($tablero, C$) $\to$ $mejorColumna$}
+    \begin{algorithmic}[1]
+		\State maxPuntaje $\gets$ 0     \Comment{$O(1)$}
+		\For{cada columna $col$ del $tablero$}        \Comment{$O(N)$ iteraciones}
+		    \State Colocar ficha en $col$       \Comment{$O(1)$}
+		    \State puntaje $\gets$ puntuarJugada($tablero, C$)     \Comment{$O($\texttt{puntuarJugada}$)$}
+		    \If{$puntaje > maxPuntaje$}     \Comment{$O(1)$}
+		        \State maxPuntaje $\gets$ puntaje       \Comment{$O(1)$} 
+		        \State mejorColumna $\gets$ col         \Comment{$O(1)$}
+		    \EndIf
+		    \State Devolver el $tablero$ a su estado original       \Comment{$O(1)$}
+        \EndFor
+        \State \textbf{return} mejorColumna
+        
+        \medskip
+		\Statex \underline{Complejidad:} $O(N) \times O($\texttt{puntuarJugada}$)$
+    \end{algorithmic}
+    \end{breakablealgorithm}
+    
+    \underline{Observación}: las operaciones sobre el tablero cuestan $O(1)$ tiempo porque este fue implementado sobre un vector de vectores de lenguaje \texttt{C++}, por lo que para colocar una ficha, sólo hace falta acceder y modificar una posición de este \textit{vector bidimensional}. \\[2pt]
+    
+    
+    
+    \subsection{Puntuando las jugadas}
+    
+    El comportamiento de \texttt{evaluarTableros} es sencillo, pues consiste simplemente en aplicar \texttt{puntuarJugada} para cada una de las columnas del tablero. Esta función se encarga de detectar en el tablero cada uno de los parámetros elegidos para su evaluación. Es decir, cuenta la cantidad de veces que aparecerían los fenómenos considerados por los parámetros, en el tablero resultante de una jugada. A su vez, a cada uno de estos aspectos, que forman la función parametrizable, se le asigna un cierto \textit{peso}: un valor numérico, que representa la importancia que se le da a ese escenario en el estado de un tablero. En esta instancia del Trabajo, estos pesos fueron asignados \textit{a mano}, según criterios \textit{razonables} que se mencionarán a continuación. En etapas posteriores del Trabajo, estos serán optimizados utilizando distintas técnicas. Los parámetros en cuestión son:
+    
+    % TODO: Revisar explicaciones de los parámetros. Deberíamos incluir los pesos que asignamos arbitrariamente, o eso debería quedar en el código?
+    
+    \begin{itemize}
+        \item Que haya $x$ fichas del jugador alineadas (en cualquiera de las direcciones posibles). La idea de este parámetro es representar qué tan cerca está el jugador de ganar la partida. Se consideraron los casos siguientes:
+            \begin{itemize}
+                \item $x = C$: esto significa que hay $C$ fichas alineadas del jugador, por lo que ganaría la partida. Evidentemente, este escenario es el ideal, y cualquier jugada que lleve a él será considerada óptima, ya que el objetivo del jugador es ganar el juego. Por lo tanto, el \textit{peso} asignado a este parámetro ha de ser el más alto (en el código que acompaña este informe, esto está representado por \texttt{efectivosC}, cuyo peso relativo es 10000).
+                \item $x = C-1$: al haber $C-1$ fichas alineadas del jugador, éste está considerablemente cerca de ganar la partida. Es cierto que el oponente podrá bloquearlo en el turno siguiente, pero en caso de que haya dos o más ocurrencias de este fenómeno, el jugador implementado podría ganar el juego, pues su oponente probablemente no pueda bloquear todas las líneas de $C-1$ fichas. Por lo tanto, el valor asignado a este parámetro es relativamente alto (representado por \texttt{efectivosC1}, con un peso de 300).
+                \item $x = C-2$: el escenario de $C-2$ fichas alineadas en el tablero fue el último que se decidió tener en cuenta en esta clase de parámetros, ya que se consideró que tiene una importancia no despreciable para el objetivo de ganar la partida. Sin embargo, no se consideraron $C-3$, $C-4$, etcétera, pues el peso que se les asignaría probablemente no cambiaría la elección de la jugada a realizar. Este parámetro se representa en el código como \texttt{efectivosC2}, y su peso asignado fue de 100.
+            \end{itemize}
+        \item Que haya $x$ posiciones en el tablero que estén ocupadas por fichas del jugador que invocó a la función, o bien que estén desocupadas. Esto representa un escenario más débil que los parámetros descritos anteriormente, ya que contempla casos en los que no hay fichas en ciertos casilleros del tablero, los cuales pueden ser aprovechados por el jugador en turnos subsiguientes para colocar sus fichas. Naturalmente, el peso asignado a estos parámetros será menor, en comparación con los tres anteriores, ya que no son tan determinantes a la hora de elegir qué jugada ejecutar. Sin embargo, hacen que el jugador implementado tenga en cuenta los espacios vacíos del tablero, lo cual puede ser útil dentro de varios turnos, dependiendo de las jugadas de su oponente. Utilizando esta lógica, se tuvo en cuenta los siguientes casos, con explicaciones similares a los parámetros ya explicados:
+            \begin{itemize}
+                \item $x = C$: esto no significa que al efectuar la jugada se obtendrían $C$ fichas en línea, sino que sería factible que eso ocurra más adelante (si es que el oponente no actúa de acuerdo a ello). Entonces, puede ser de utilidad conocer esta situación para elegir entre dos o más jugadas que puntuasen de igual manera con los otros parámetros definidos hasta ahora. Este escenario es contemplado usando \texttt{posiblesC} en el código, y el peso asignado fue de 20.
+                \item $x = C-1$: es la misma idea que se describió en el ítem anterior, pero más débil. Por lo tanto, el peso asignado será relativamente menor: 15 (\texttt{posiblesC1} en el código).
+                \item $x = C-2$: equivalentemente, representa la posibilidad de que el jugador pueda obtener $C-2$ fichas propias alineadas en un turno futuro. El peso asignado es también menor, habiendo elegido el valor 10 (ver \texttt{posiblesC2} en el código del Trabajo).
+            \end{itemize}
+        \item Cabe remarcar que los dos tipos de parámetros mencionados hasta ahora son de carácter meramente ofensivo; es decir, al usarlos, el jugador se enfoca en ganar la partida. Sin embargo, esto sería insuficiente: es necesario considerar que existe un oponente, que también intentará ganar el juego. Por lo tanto, se incluye también una serie de parámetros de índole defensiva, que representan el escenario siguiente: al efectuar una jugada, el jugador bloqueará una secuencia de $x$ fichas del oponente, impidiéndole llegar a alinear $C$ fichas, en la medida de lo posible. Así, se puede implementar una estrategia de defensa, basada en bloquear las líneas del rival. A pesar de la importancia de esto, el peso asignado a estos parámetros es menor con respecto a los primeros tres (que estaban claramente orientados a ganar); la razón de esto es que el objetivo del jugador que se desea implementar es vencer a sus oponentes. Por eso, tiene sentido darle mayor importancia a las variables relacionadas con la victoria. Sea como fuere, los parámetros defensivos que se consideraron son:
+            \begin{itemize}
+                \item $x = C-1$: si esta situación es detectada por el jugador al evaluar el estado del tablero, significa que le está impidiendo al rival ganar la partida; es decir, de no efectuar esta jugada, el oponente le vencerá (a no ser que el jugador pueda ganar antes). Por lo tanto, el peso de este parámetro deberá ser alto, pero no tan alto como el de ganar el juego. En el código, este parámetro se implementa con la variable \texttt{bloqueosC1}, y el peso que se le asignó es de 3000.
+                \item $x = C-2$: bloquear una cadena de $C-2$ fichas del rival también es importante, pues es muy probable que, de no hacerlo, éste pueda acercarse peligrosamente a ganar la partida en el siguiente turno. Por ejemplo, bloquear una cadena de 2 horizontales fichas en un juego de \textit{4 en línea} es importante, pues si el oponente logra alinear 3 fichas, bloquearlo en el turno siguiente puede ser inútil, pues aunque se le bloquee una forma de alinear 4 fichas, posiblemente tenga otra manera (si y sólo si la cadena de fichas no toca ninguno de los extremos del tablero). Por consiguiente, el peso para este parámetro no puede ser muy bajo: así, se eligió el valor 200 (ver \texttt{bloqueosC2}). Observar que este valor es menor que el de \texttt{efectivosC1}, pues es más importante alinear $C-1$ fichas propias en pos de intentar ganar la partida.
+                \item $x = C-3$: este parámetro es menos importante, ya que si se le diese un peso muy alto, el jugador implementado se ocuparía demasiado de bloquear un escenario que puede ser muy frecuente en el juego, pero no prioritario, provocando que desatienda la meta de vencer al oponente, dedicándose casi exclusivamente a defenderse del rival. Por eso, el peso asignado a este parámetro, contabilizado con \texttt{bloqueosC3}, es de 20.
+            \end{itemize}
+    \end{itemize}
+    
+    Los pesos asignados a cada uno de estos parámetros forman una configuración posible de la función paramétrica; en particular, se trata de una configuración de carácter goloso. Así, se utilizarán estos valores numéricos para generar una puntuación para cada jugada posible. Este puntaje es producido por la función \texttt{score}, y es calculado realizando la suma de cada uno de los pesos multiplicado por la cantidad de ocurrencias de los fenómenos a los que se asocia. Formalmente:
+    
+    \begin{center}
+        \texttt{PUNTAJE}($J$) =  $\sum_{i \in \Pi} \#ocurrencias_{i}(J) \times peso_{i} $ 
+    \end{center}
+    
+    donde:
+    \begin{itemize}
+        \item $J$ es la jugada que se está puntuando.
+        \item $i$ es cada parámetro del conjunto de parámetros considerados $\Pi$.
+        \item $\#ocurrencias_{i}(J)$ es la cantidad de veces que se detectó el fenómeno representado por $i$ en la jugada $J$.
+        \item $peso_{i}$ es el peso que se le asignó al parámetro $i$.
+    \end{itemize}
+    
+    Falta por explicar la forma en la que se calcula la cantidad de ocurrencias para los distintos parámetros. Para ello, se buscan cadenas de $x$ fichas (o espacios libres, según corresponda) en el tablero. Esto se delega a cuatro procedimientos:
+        \begin{itemize}
+            \item \texttt{puntuarHorizintal}: busca $x$ alineados en horizontal.
+            \item \texttt{puntuarVertical}: busca $x$ alineados en vertical.
+            \item \texttt{puntuarDiagonalNE} (NE: noreste): busca $x$ alineados en diagonal, con dirección $\langle$ izquierda, abajo $\rangle$ hacia $\langle$ derecha, arriba $\rangle$.
+            \item \texttt{puntuarDiagonalSE} (SE: sudeste): busca $x$ alineados en diagonal, con dirección $\langle$ izquierda, arriba $\rangle$ hacia $\langle$ derecha, abajo $\rangle$.
+        \end{itemize}
+        
+    Luego, el funcionamiento de \texttt{puntuarJugada} consiste simplemente en invocar a estas cuatro funciones enumeradas, para obtener la cantidad de ocurrencias correspondiente a cada uno de los parámetros. Esta información es tomada por \texttt{score}, que calcula la puntuación de cada una de las posibles jugadas, y así es como se decide cuál es la próxima a realizar para cada estado del tablero de \textit{C en línea}.
+    
+    Una vez determinada la mejor jugada, se transmite al \textit{Juez} la columna en la que el jugador decidió colocar su ficha. Este Juez sera el encargado de llevar adelante la partida, administrando los turnos, registrando las jugadas que se van generando y terminando la partida en el caso de que haya un ganador identificando al mismo. El mismo fue provisto por la cátedra, y fue reimplementado en lenguaje \texttt{C++} por el grupo, para poder realizar la experimentación necesaria para evaluar las optimizaciones que se hará sobre los parámetros en etapas posteriores del desarrollo.
+    
+    
+    \subsection{Complejidad temporal}
+    
+    % TODO: Justificar O(NxM)
+    
+
+\newpage
+
+%----------------------------------------------------------------------------------------------------------
+
+
+\section{Optimización de los parámetros 1: \textit{grid-search}}
+
+
+
+	
+	
+\newpage
+
+%----------------------------------------------------------------------------------------------------------
+	
+
+\section{Optimización de los parámetros 2: algoritmo genético}
+
+
+
+	
+	
+\newpage
+
+%----------------------------------------------------------------------------------------------------------
+		
+	
+\section{Experimentación y resultados}
+
+
+
+
+\newpage
+
+%----------------------------------------------------------------------------------------------------------
+
+
+\section{Conclusiones}
+
+
+
+
+
+
+
+
+
+%----------------------------------------------------------------------------------------------------------
+
+\end{document}
