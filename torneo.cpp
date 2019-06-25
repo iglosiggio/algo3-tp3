@@ -8,12 +8,12 @@
  *       punteros para utilzar como contexto en lugar de meter todo como
  *       globales en `evaluarTableros` */
 struct scores greedy_conf {
-	.posc2 = 10,
-	.posc1 = 15,
-	.posc = 20,
-	.c2 = 100,
-	.c1 = 300,
-	.c = 10000,
+	.posc3 = 10,
+	.posc2 = 15,
+	.posc1 = 20,
+	.c3 = 100,
+	.c2 = 300,
+	.c1 = 10000,
 	.bloqueos_c3 = 20,
 	.bloqueos_c2 = 200,
 	.bloqueos_c1 = 3000
