@@ -135,11 +135,13 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
             int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
 					params);
 
-            tablero[fichas[columns]][columns] = 1;
-            fichas[columns]++;
+            
+            tablero[fichas[col]][col] = 1;
+            fichas[col]++;
             puntaje -= puntuarEnemigo(tablero, fichas, c, p, 2, params) / 2;
-            fichas[columns]--;
-            tablero[fichas[columns]][columns] = 0;
+            fichas[col]--;
+            tablero[fichas[col]][col] = 0;
+            
 
             std::cerr << "col: " << col
                       << " puntaje: " << puntaje << std::endl;
