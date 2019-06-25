@@ -44,7 +44,7 @@ int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
 	Tablero partida(cols, vector<int>(rows, 0));
 	Fichas fichas(cols, 0);
 
-	for (int i = 0; i < 2 * p; i++) {
+	for (int i = 0; i < p; i++) {
 		int jugada;
 	       
 		jugada = primero(partida, fichas, c, p, 1, ctx1);
