@@ -39,8 +39,6 @@ static inline bool hay_ganador(const Tablero& t, int c) {
 	return false;
 }
 
-#include <iostream>
-
 int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
 	 Jugador segundo, const void* ctx2) {
 	Tablero partida(cols, vector<int>(rows, 0));
@@ -55,7 +53,7 @@ int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
 		if (hay_ganador(partida, c))
 			return 1;
 
-		jugada = primero(partida, fichas, c, p, 2, ctx2);
+		jugada = segundo(partida, fichas, c, p, 2, ctx2);
 		partida[fichas[jugada]][jugada] = 2;
 		fichas[jugada]++;
 		if (hay_ganador(partida, c))
