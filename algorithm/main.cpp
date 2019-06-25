@@ -31,15 +31,15 @@ std::string read_str() {
 }
 
 struct scores greedy_conf {
-	.posc2 = 5,
-	.posc1 = 15,
-	.posc = 20,
-	.c2 = 150,
-	.c1 = 400,
-	.c = 10000,
+	.posc3 = 5,
+	.posc2 = 15,
+	.posc1 = 20,
+	.c3 = 150,
+	.c2 = 400,
+	.c1 = 10000,
 	.bloqueos_c3 = 20,
-	.bloqueos_c2 = 200,
-	.bloqueos_c1 = 3000
+	.bloqueos_c2 = 400,
+	.bloqueos_c1 = 8000
 };
 
 int main() {

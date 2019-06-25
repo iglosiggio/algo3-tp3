@@ -8,12 +8,12 @@ using Tablero = vector<vector<int>>;
 using Fichas = vector<int>;
 
 struct scores {
+	int posc3;
 	int posc2;
 	int posc1;
-	int posc;
+	int c3;
 	int c2;
 	int c1;
-	int c;
 	int bloqueos_c3;
 	int bloqueos_c2;
 	int bloqueos_c1;
