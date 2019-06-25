@@ -31,11 +31,11 @@ std::string read_str() {
 }
 
 struct scores greedy_conf {
-	.posc2 = 10,
+	.posc2 = 5,
 	.posc1 = 15,
 	.posc = 20,
-	.c2 = 100,
-	.c1 = 300,
+	.c2 = 150,
+	.c1 = 400,
 	.c = 10000,
 	.bloqueos_c3 = 20,
 	.bloqueos_c2 = 200,
@@ -45,7 +45,7 @@ struct scores greedy_conf {
 int main() {
 
     std::string msg, color, oponent_color, go_first;
-    int columns, rows, c, p, move;
+    int columns, rows, c, p;
 
     while (true) {
 

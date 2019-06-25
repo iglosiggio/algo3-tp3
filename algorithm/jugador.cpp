@@ -2,254 +2,93 @@
 
 #include "jugador.h"
 
-int posiblesC2;
-int posiblesC1;
-int posiblesC;
+struct contadores {
+    int C, C1, C2, C3;
+};
 
-int efectivosC2;
-int efectivosC1;
-int efectivosC;
+struct contadores bloqueos {0, 0, 0, 0};
+struct contadores efectivos {0, 0, 0, 0};
+struct contadores posibles {0, 0, 0, 0};
 
-int bloqueosC3;
-int bloqueosC2;
-int bloqueosC1;
-
-void puntuarHorizontal(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
-
-    int contadorEfectivo = 0;
-    int contadorPosibles = 0;
-    int contadorBloqueos = 0;
-
-    for(int i= coljugada + 1 - c; i < coljugada + c; i++){
-
-        if(i >= 0 && i < m){
-
-            if(tablero[fichas[coljugada]][i] != 0) {
-                if(tablero[fichas[coljugada]][i] == player) {
-                    contadorEfectivo++;
-                    contadorPosibles++;
-                    contadorBloqueos = 0;
-
-                    if(contadorEfectivo == c-2)
-                        efectivosC2++;
-                    if(contadorEfectivo == c-1)
-                        efectivosC1++;
-                    if(contadorEfectivo == c)
-                        efectivosC++;
-
-                }else {
-                    contadorBloqueos++;
-                    contadorEfectivo = 0;
-                    contadorPosibles = 0;
-
-                    if(contadorBloqueos == c-3)
-                        bloqueosC3++;
-                    if(contadorBloqueos == c-2)
-                        bloqueosC2++;
-                    if(contadorBloqueos == c-1)
-                        bloqueosC1++;
-                }
-            } else {
-                contadorPosibles++;
-            }
-
-            if(contadorPosibles >= c-2)
-                posiblesC2++;
-            if(contadorPosibles >=c-1)
-                posiblesC1++;
-            if(contadorPosibles >=c)
-                posiblesC++;
-        }
-    }
+int elegirEje(int valor, int eje, int c){
+    return valor - eje * (c - 1);
 }
 
-void puntuarVertical(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
+void actualizarContadores(struct contadores& contadores, int racha, int c) {
+    if(racha >= c)
+        contadores.C++;
+    if(racha >= c - 1)
+        contadores.C1++;
+    if(racha >= c - 2)
+        contadores.C2++;
+    if(racha >= c - 3)
+        contadores.C3++;
+}
 
-    int contadorEfectivo = 0;
-    int contadorPosibles = 0;
-    int contadorBloqueos = 0;
+void puntuar(int ejeX, int ejeY, Tablero tablero, Fichas fichas, int coljugada, int c, int p, int player){
 
-    for(int i= fichas[coljugada] + 1 - c; i < fichas[coljugada] + c; i++){
-        if(i >= 0 && i < n){
-            if(tablero[i][coljugada] != 0) {
-                if(tablero[i][coljugada] == player) {
-                    contadorEfectivo++;
-                    contadorPosibles++;
-                    contadorBloqueos = 0;
+    int m = tablero[0].size();
+    int n = tablero.size();
 
-                    if(contadorEfectivo == c-2)
-                        efectivosC2++;
-                    if(contadorEfectivo == c-1)
-                        efectivosC1++;
-                    if(contadorEfectivo == c)
-                        efectivosC++;
-                }else {
-                    contadorBloqueos++;
-                    contadorEfectivo = 0;
-                    contadorPosibles = 0;
+    int rachaEfectiva = 0;
+    int rachaPosible = 0;
+    int rachaBloqueada = 0;
 
-                    if(contadorBloqueos == c-3)
-                        bloqueosC3++;
-                    if(contadorBloqueos == c-2)
-                        bloqueosC2++;
-                    if(contadorBloqueos == c-1)
-                        bloqueosC1++;
+    int rowindex = elegirEje(coljugada, ejeX, c);
+    int colindex = elegirEje(fichas[coljugada], ejeY, c);
+
+    for(int i = 0; i < c * 2 - 1; i++) {
+        if(rowindex >= 0 && colindex >= 0 && rowindex < m && colindex < n) {
+            if(tablero[colindex][rowindex] != 0) {
+                if(tablero[colindex][rowindex] == player) {
+                    rachaEfectiva++;
+                    rachaPosible++;
+                    rachaBloqueada = 0;
+
+                    actualizarContadores(efectivos, rachaEfectiva, c);
+                } else {
+                    rachaBloqueada++;
+                    rachaEfectiva = 0;
+                    rachaPosible = 0;
+
+                    actualizarContadores(bloqueos, rachaBloqueada, c);
                 }
             } else
-                contadorPosibles++;
+                rachaPosible++;
 
-            if(contadorPosibles >= c-2)
-                posiblesC2++;
-            if(contadorPosibles >=c-1)
-                posiblesC1++;
-            if(contadorPosibles >=c)
-                posiblesC++;
+            actualizarContadores(posibles, rachaPosible, c);
         }
+
+        rowindex += ejeX;
+        colindex += ejeY;
     }
 }
-
-
-void puntuarDiagSE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
-
-    int contadorEfectivo = 0;
-    int contadorPosibles = 0;
-    int contadorBloqueos = 0;
-
-    int rowindex = fichas[coljugada] + 1 - c;
-    int colindex = coljugada + 1 - c;
-
-    for(int i = 0; i < c * 2; i++){
-
-        if(rowindex >= 0 && colindex >= 0 && rowindex < n && colindex < m){
-
-            if(tablero[rowindex][colindex] != 0) {
-                if(tablero[rowindex][colindex] == player) {
-                    contadorEfectivo++;
-                    contadorPosibles++;
-                    contadorBloqueos = 0;
-
-                    if(contadorEfectivo == c-2)
-                        efectivosC2++;
-                    if(contadorEfectivo == c-1)
-                        efectivosC1++;
-                    if(contadorEfectivo == c)
-                        efectivosC++;
-                }else {
-                    contadorBloqueos++;
-                    contadorEfectivo = 0;
-                    contadorPosibles = 0;
-
-                    if(contadorBloqueos == c-3)
-                        bloqueosC3++;
-                    if(contadorBloqueos == c-2)
-                        bloqueosC2++;
-                    if(contadorBloqueos == c-1)
-                        bloqueosC1++;
-                }
-            } else {
-                contadorPosibles++;
-
-
-            }
-
-            if(contadorPosibles >= c-2)
-                posiblesC2++;
-            if(contadorPosibles >=c-1)
-                posiblesC1++;
-            if(contadorPosibles >=c)
-                posiblesC++;
-        }
-        rowindex++;
-        colindex++;
-    }
-}
-
-void puntuarDiagNE(Tablero tablero, Fichas fichas, int coljugada, int m, int n, int c, int p, int player){
-
-    int contadorEfectivo = 0;
-    int contadorPosibles = 0;
-    int contadorBloqueos = 0;
-
-    int rowindex = fichas[coljugada] + 1 - c;
-    int colindex = coljugada + c;
-
-    for(int i = 0; i < c * 2; i++){
-
-        if(rowindex >= 0 && colindex >= 0 && rowindex < n && colindex < m){
-
-            if(tablero[rowindex][colindex] != 0) {
-                if(tablero[rowindex][colindex] == player) {
-                    contadorEfectivo++;
-                    contadorPosibles++;
-                    contadorBloqueos = 0;
-
-                    if(contadorEfectivo == c-2)
-                        efectivosC2++;
-                    if(contadorEfectivo == c-1)
-                        efectivosC1++;
-                    if(contadorEfectivo == c)
-                        efectivosC++;
-                }else {
-                    contadorBloqueos++;
-                    contadorEfectivo = 0;
-                    contadorPosibles = 0;
-
-                    if(contadorBloqueos == c-3)
-                        bloqueosC3++;
-                    if(contadorBloqueos == c-2)
-                        bloqueosC2++;
-                    if(contadorBloqueos == c-1)
-                        bloqueosC1++;
-                }
-            } else
-                contadorPosibles++;
-
-            if(contadorPosibles >= c-2)
-                posiblesC2++;
-            if(contadorPosibles >=c-1)
-                posiblesC1++;
-            if(contadorPosibles >=c)
-                posiblesC++;
-        }
-        rowindex++;
-        colindex--;
-    }
-}
-
 
 int score(Tablero tablero, Fichas fichas, const struct scores* scores) {
     int score = 0;
-    score += scores->posc2 * posiblesC2;
-    score += scores->posc1 * posiblesC1;
-    score += scores->posc * posiblesC;
-    score += scores->c2 * efectivosC2;
-    score += scores->c1 * efectivosC1;
-    score += scores->c * efectivosC;
-    score += scores->bloqueos_c3 * bloqueosC3;
-    score += scores->bloqueos_c2 * bloqueosC2;
-    score += scores->bloqueos_c1 * bloqueosC1;
+    score += scores->posc2       * posibles.C2;
+    score += scores->posc1       * posibles.C1;
+    score += scores->posc        * posibles.C;
+    score += scores->c2          * efectivos.C2;
+    score += scores->c1          * efectivos.C1;
+    score += scores->c           * efectivos.C;
+    score += scores->bloqueos_c3 * bloqueos.C3;
+    score += scores->bloqueos_c2 * bloqueos.C2;
+    score += scores->bloqueos_c1 * bloqueos.C1;
     return score;
 }
 
 int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int c, int p,
 		  int player, const struct scores* scores) {
-    int m = tablero[0].size();
-    int n = tablero.size();
-    posiblesC2 = 0;
-    posiblesC1 = 0;
-    posiblesC = 0;
 
-    efectivosC2 = 0;
-    efectivosC1 = 0;
-    efectivosC = 0;
+    bloqueos  = {0, 0, 0, 0};
+    efectivos = {0, 0, 0, 0};
+    posibles  = {0, 0, 0, 0};
 
-    bloqueosC3 = 0;
-    bloqueosC2 = 0;
-    bloqueosC1 = 0;
-    puntuarHorizontal(tablero, fichas, coljugada, m, n, c, p, player);
-    puntuarVertical(tablero, fichas, coljugada, m, n, c, p, player);
-    puntuarDiagSE(tablero, fichas, coljugada, m, n, c, p, player);
-    puntuarDiagNE(tablero, fichas, coljugada, m, n, c, p, player);
+    puntuar(1, 0, tablero, fichas, coljugada, c, p, player);
+    puntuar(0, 1, tablero, fichas, coljugada, c, p, player);
+    puntuar(1, 1, tablero, fichas, coljugada, c, p, player);
+    puntuar(1, -1, tablero, fichas, coljugada, c, p, player);
 
     return score(tablero, fichas, scores);
 
@@ -270,8 +109,8 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
             int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
 					(const struct scores*) ctx);
 
-	    std::cerr << "col: " << col
-		      << " puntaje: " << puntaje << std::endl;
+            std::cerr << "col: " << col
+                << " puntaje: " << puntaje << std::endl;
             if(mejorPuntaje < puntaje){
                 mejorPuntaje = puntaje;
                 mejorCol = col;
