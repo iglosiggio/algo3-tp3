@@ -59,10 +59,6 @@ void puntuar(int ejeX, int ejeY, Tablero tablero, Fichas fichas, int coljugada, 
                 rachaPosible++;
             
             actualizarContadores(posibles, rachaPosible, c);
-
-            if(coljugada==2 && ejeX == 1 && ejeY == 0){
-                std::cerr << "bloqueos: " << rachaBloqueada << std::endl;
-            }
         }
 
         rowindex += ejeX;
@@ -100,6 +96,30 @@ int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int c, int p,
 
 }
 
+int puntuarEnemigo(Tablero tablero, Fichas fichas, int c, int p, int player,
+		    const struct scores* params) {
+
+    int columns = tablero[0].size();
+    int rows = tablero.size();
+    int mejorPuntaje = INT32_MIN;
+    int mejorCol;
+    
+    for(int col = 0; col < columns; col++) {
+
+        if(fichas[col] < rows){
+            int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
+					params);
+
+            if(mejorPuntaje < puntaje){
+                mejorPuntaje = puntaje;
+                mejorCol = col;
+            }
+        }
+    }
+
+    return mejorCol;
+}
+
 int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
 		    const void* ctx) {
 
@@ -114,6 +134,12 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
         if(fichas[col] < rows){
             int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
 					params);
+
+            tablero[fichas[columns]][columns] = 1;
+            fichas[columns]++;
+            puntaje -= puntuarEnemigo(tablero, fichas, c, p, 2, params) / 2;
+            fichas[columns]--;
+            tablero[fichas[columns]][columns] = 0;
 
             std::cerr << "col: " << col
                       << " puntaje: " << puntaje << std::endl;
