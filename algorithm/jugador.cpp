@@ -102,7 +102,6 @@ int puntuarEnemigo(Tablero tablero, Fichas fichas, int c, int p, int player,
     int columns = tablero[0].size();
     int rows = tablero.size();
     int mejorPuntaje = INT32_MIN;
-    int mejorCol;
     
     for(int col = 0; col < columns; col++) {
 
@@ -112,12 +111,11 @@ int puntuarEnemigo(Tablero tablero, Fichas fichas, int c, int p, int player,
 
             if(mejorPuntaje < puntaje){
                 mejorPuntaje = puntaje;
-                mejorCol = col;
             }
         }
     }
 
-    return mejorCol;
+    return mejorPuntaje;
 }
 
 int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
@@ -134,7 +132,6 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
         if(fichas[col] < rows){
             int puntaje = puntuarJugada(tablero, fichas, col, c, p, player,
 					params);
-
             
             tablero[fichas[col]][col] = 1;
             fichas[col]++;
@@ -142,9 +139,10 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
             fichas[col]--;
             tablero[fichas[col]][col] = 0;
             
-
+            /* 
             std::cerr << "col: " << col
                       << " puntaje: " << puntaje << std::endl;
+            */
 
             if(mejorPuntaje < puntaje){
                 mejorPuntaje = puntaje;
