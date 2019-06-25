@@ -39,26 +39,35 @@ static inline bool hay_ganador(const Tablero& t, int c) {
 	return false;
 }
 
-int juez(int cols, int rows, int c, int p, Jugador primero, const void* ctx1,
-	 Jugador segundo, const void* ctx2) {
+static inline int min(int a, int b) {
+	return a < b ? a : b;
+}
+
+struct resultados juez(int cols, int rows, int c, int p, Jugador primero,
+	const void* ctx1, Jugador segundo, const void* ctx2) {
+	int turnos = min(2 * p, rows * cols);
 	Tablero partida(cols, vector<int>(rows, 0));
 	Fichas fichas(cols, 0);
 
-	for (int i = 0; i < p; i++) {
+	for (int i = 0; i < turnos; i++) {
 		int jugada;
 	       
 		jugada = primero(partida, fichas, c, p, 1, ctx1);
 		partida[fichas[jugada]][jugada] = 1;
 		fichas[jugada]++;
 		if (hay_ganador(partida, c))
-			return 1;
+			return {1, i};
+
+		i++;
+		if (i >= turnos)
+			return {0, i};
 
 		jugada = segundo(partida, fichas, c, p, 2, ctx2);
 		partida[fichas[jugada]][jugada] = 2;
 		fichas[jugada]++;
 		if (hay_ganador(partida, c))
-			return 2;
+			return {2, i};
 	}
 
-	return 0;
+	return {0, turnos};
 }

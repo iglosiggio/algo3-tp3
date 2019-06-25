@@ -20,9 +20,12 @@ struct scores greedy_conf {
 };
 
 int main (int argc, char** argv) {
-	std::cout << "El ganador es: "
-		  << juez(10, 10, 7, 50, evaluarTableros, &greedy_conf,
-			  evaluarTableros, &greedy_conf)
+	struct resultados partida = juez(
+		10, 10, 7, 50, evaluarTableros, &greedy_conf, evaluarTableros,
+		&greedy_conf
+	);
+	std::cout << "El ganador es: " << partida.ganador
+		  << " a los " << partida.turnos << " turnos"
 		  << std::endl;
 
 	return 0;
