@@ -28,10 +28,10 @@ static inline bool hay_ganador(const Tablero& t, int c) {
 			bool hay_espacio_se = hay_espacio_e && hay_espacio_s;
 			bool hay_espacio_sw = hay_espacio_s && j + 1 >= c;
 
-			if (   hay_espacio_e  && hay_c(t, c, i, j, 0,  1)
-			    || hay_espacio_s  && hay_c(t, c, i, j, 1,  0)
-			    || hay_espacio_se && hay_c(t, c, i, j, 1,  1)
-			    || hay_espacio_sw && hay_c(t, c, i, j, 1, -1))
+			if (   (hay_espacio_e  && hay_c(t, c, i, j, 0,  1))
+			    || (hay_espacio_s  && hay_c(t, c, i, j, 1,  0))
+			    || (hay_espacio_se && hay_c(t, c, i, j, 1,  1))
+			    || (hay_espacio_sw && hay_c(t, c, i, j, 1, -1)))
 				return true;
 		}
 

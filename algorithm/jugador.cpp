@@ -128,7 +128,7 @@ int evaluarTableros(Tablero& tablero, Fichas& fichas, int c, int p, int player,
     int columns = tablero[0].size();
     int rows = tablero.size();
     int mejorPuntaje = INT32_MIN;
-    int mejorCol;
+    int mejorCol = 0;
     const struct scores* params = (const struct scores*) ctx;
     
     for(int col = 0; col < columns; col++) {

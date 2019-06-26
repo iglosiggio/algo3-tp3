@@ -7,6 +7,7 @@ tags:
 	ctags -R .
 
 clean:
+	rm -f genetico grid
 	$(MAKE) -C src clean
 	rm -f tags
 

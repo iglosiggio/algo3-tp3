@@ -33,8 +33,8 @@ const int cant_partidas = sizeof(partidas) / sizeof (partidas[0]);
 
 static void fitness_torneo(poblacion& ejemplares) {
 	for (const struct config_partida& p : partidas) {
-		for (int i = 0; i < ejemplares.size(); i++)
-		for (int j = i + 1; j < ejemplares.size(); j++) {
+		for (long unsigned i = 0; i < ejemplares.size(); i++)
+		for (long unsigned j = i + 1; j < ejemplares.size(); j++) {
 			struct resultados ida = juez(
 				p.n, p.m, p.c, p.n * p.m,
 				evaluarTableros, &ejemplares[i].params,
@@ -193,11 +193,13 @@ static const vector<struct mutador> mutaciones = {
 	{"normal",	mutacion_normal}
 };
 
-static poblacion seleccionar_mejores(const poblacion& ejemplares, int k) {
+static poblacion seleccionar_mejores(const poblacion& ejemplares,
+				     long unsigned k) {
 	return poblacion(ejemplares.begin(), ejemplares.begin() + k);
 }
 
-static poblacion seleccionar_sorteando(const poblacion& ejemplares, int k) {
+static poblacion seleccionar_sorteando(const poblacion& ejemplares,
+				       long unsigned k) {
 	std::deque<struct ejemplar> cola(ejemplares.begin(), ejemplares.end());
 	poblacion resultado;
 	resultado.reserve(k);
@@ -219,7 +221,7 @@ static poblacion seleccionar_sorteando(const poblacion& ejemplares, int k) {
 
 struct selector {
 	string nombre;
-	poblacion (*seleccionar)(const poblacion&, int);
+	poblacion (*seleccionar)(const poblacion&, long unsigned);
 };
 
 static const vector<struct selector> selectores = {
