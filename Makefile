@@ -1,3 +1,5 @@
+CXXFLAGS+=-Wall
+
 all:
 	$(MAKE) -C src all
 
