@@ -2,6 +2,7 @@
 #include <vector>
 #include <deque>
 #include <random>
+#include <algorithm>
 
 #include "juez.h"
 #include "algorithm/jugador.h"
@@ -19,6 +20,7 @@ bool operator<(const struct ejemplar& a, const struct ejemplar& b) {
 	return a.fitness > b.fitness;
 }
 
+using std::string;
 using std::vector;
 using poblacion = vector<struct ejemplar>;
 
@@ -79,16 +81,18 @@ static void fitness_puntaje(poblacion& ejemplares) {
 	}
 }
 
-static const struct {
-	const char* nombre;
+struct evaluador {
+	string nombre;
 	void (*evaluar)(poblacion&);
-} evaluaciones[] = {
+};
+
+static const vector<struct evaluador> evaluaciones = {
 	{"torneo",	fitness_torneo},
 	{"puntaje",	fitness_puntaje}
 };
 
 static struct scores crossover_moneda(const struct scores& a,
-				      const struct scores& b) {
+					const struct scores& b) {
 	struct scores resultado = a;
 	std::bernoulli_distribution moneda(0.5);
 
@@ -115,7 +119,7 @@ static struct scores crossover_moneda(const struct scores& a,
 }
 
 static struct scores crossover_promedio(const struct scores& a,
-					const struct scores& b) {
+					  const struct scores& b) {
 	struct scores resultado;
 
 	resultado.posc3 = (a.posc3 + b.posc3) / 2;
@@ -131,10 +135,12 @@ static struct scores crossover_promedio(const struct scores& a,
 	return resultado;
 }
 
-static const struct {
-	const char* nombre;
+struct cruzador {
+	string nombre;
 	struct scores (*cruzar)(const struct scores&, const struct scores&);
-} crossovers[] = {
+};
+
+static const vector<struct cruzador> crossovers = {
 	{"moneda",	crossover_moneda},
 	{"promedio",	crossover_promedio}
 };
@@ -177,10 +183,12 @@ static void mutacion_normal(struct scores& a) {
 	a.bloqueos_c1 *= normal(gen);
 }
 
-static const struct {
-	const char* nombre;
+struct mutador {
+	string nombre;
 	void (*mutar)(struct scores&);
-} mutations[] = {
+};
+
+static const vector<struct mutador> mutaciones = {
 	{"uniforme",	mutacion_uniforme},
 	{"normal",	mutacion_normal}
 };
@@ -209,14 +217,153 @@ static poblacion seleccionar_sorteando(const poblacion& ejemplares, int k) {
 	return resultado;
 }
 
-static const struct {
-	const char* nombre;
+struct selector {
+	string nombre;
 	poblacion (*seleccionar)(const poblacion&, int);
-} selectores[] = {
+};
+
+static const vector<struct selector> selectores = {
 	{"mejores",	seleccionar_mejores},
 	{"sortear",	seleccionar_sorteando}
 };
 
+static inline poblacion nueva_poblacion(int tamanio) {
+	poblacion resultado;
+	resultado.reserve(tamanio);
+
+	std::uniform_int_distribution<int> dado(0, 1000);
+
+	for (int i = 0; i < tamanio; i++) {
+		resultado.push_back({{
+			dado(gen), dado(gen), dado(gen), dado(gen), dado(gen),
+			dado(gen), dado(gen), dado(gen), dado(gen)
+		}, 0});
+	}
+
+	return resultado;
+}
+
+static inline void imprimir_fitness(const poblacion& poblacion, int gen) {
+	using std::cout;
+	using std::endl;
+
+	float fitness_total = 0;
+	for (const struct ejemplar& e : poblacion)
+		fitness_total += e.fitness;
+
+	float fitness_promedio = fitness_total / poblacion.size();
+	float fitness_error_cuadrado = 0;
+	for (const struct ejemplar& e : poblacion)
+		fitness_error_cuadrado += (e.fitness - fitness_promedio)
+					* (e.fitness - fitness_promedio);
+
+	float mayor_fitness = poblacion[0].fitness;
+	const struct scores& mejor = poblacion[0].params;
+
+	/* Formato:
+	 * TIPO    GEN    CAMPO1    CAMPO2    CAMPO3    ...    CAMPOn */
+	cout << "data\t"
+	     << gen << "\t"
+	     << fitness_promedio << "\t"
+	     << sqrt(fitness_error_cuadrado / (poblacion.size() - 1)) << endl;
+	cout << "mejor\t"
+	     << gen << "\t"
+	     << mayor_fitness << "\t"
+	     << mejor.posc3 << "\t"
+	     << mejor.posc2 << "\t"
+	     << mejor.posc1 << "\t"
+	     << mejor.c3 << "\t"
+	     << mejor.c2 << "\t"
+	     << mejor.c1 << "\t"
+	     << mejor.bloqueos_c3 << "\t"
+	     << mejor.bloqueos_c2 << "\t"
+	     << mejor.bloqueos_c1 << endl;
+}
+
+template <class T>
+static inline T buscar(const char* nombre, vector<T> opciones) {
+	for (auto opcion : opciones)
+		if (opcion.nombre == nombre)
+			return opcion;
+	throw "No encontrado";
+}
+
 int main (int argc, char** argv) {
+	using std::cout;
+	using std::endl;
+	using std::stoi;
+	using std::sort;
+
+	int generaciones;
+	struct evaluador evaluador;
+	struct cruzador cruzador;
+	struct mutador mutador;
+	struct selector selector;
+
+	try {
+		if (argc != 6)
+			throw "Pocos params";
+
+		generaciones = stoi(argv[1]);
+		evaluador = buscar(argv[2], evaluaciones);
+		cruzador = buscar(argv[3], crossovers);
+		mutador = buscar(argv[4], mutaciones);
+		selector = buscar(argv[5], selectores);
+	} catch (...) {
+		cout << "Uso: " << argv[0]
+		     << " <generaciones> <fit> <cross> <mut> <sel>" << endl;
+		cout << "\t generaciones = número" << endl;
+		cout << "\t fit   = torneo  | puntaje" << endl;
+		cout << "\t cross = moneda  | promedio" << endl;
+		cout << "\t mut   = normal  | uniforme" << endl;
+		cout << "\t sel   = mejores | sorteando" << endl;
+		return 1;
+	}
+
+	const int K = 5;
+	const int tamanio_poblacion = 50;
+	/* Generamos la poblacion inicial */
+	poblacion actual = nueva_poblacion(tamanio_poblacion);
+
+	for (int i = 0; i < generaciones; i++) {
+		/* 1. Evalúo la aptitud de cada ejemplar */
+		evaluador.evaluar(actual);
+		sort(actual.begin(), actual.end());
+
+		imprimir_fitness(actual, i);
+
+		float fitness_total = 0;
+		for (const struct ejemplar& e : actual)
+			fitness_total += e.fitness;
+
+		/* Normalizo los fitness para el selector */
+		for (struct ejemplar& e : actual)
+			e.fitness /= fitness_total;
+
+		/* 2. Selecciono un subconjunto de la población */
+		actual = selector.seleccionar(actual, K);
+		actual.resize(tamanio_poblacion);
+
+		/* Limpio los valores de fitness de los nuevos */
+		for (struct ejemplar& e : actual)
+			e.fitness = 0;
+
+		/* Duplico los padres (en la nueva generación los muto). */
+		actual.insert(actual.end(), actual.begin(), actual.end());
+
+		/* 3. Genero la nueva generación cruzando ejemplares */
+		for (int i = 0; i < K; i++)
+		for (int j = i + 1; j < K; j++) {
+			struct scores params = cruzador.cruzar(
+				actual[i].params, actual[j].params
+			);
+			actual.push_back({params, 0});
+		}
+
+		/* 4. Muto los ejemplares */
+		for (struct ejemplar& e : actual)
+			mutador.mutar(e.params);
+	}
+
 	return 0;
 }
