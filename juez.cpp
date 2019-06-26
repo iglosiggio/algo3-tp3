@@ -7,13 +7,12 @@ static inline bool hay_c(const Tablero& t, int c, int i, int j, int di,
 	if (jugador == 0)
 		return false;
 
-	do {
-		c--;
+	while (--c) {
 		i += di;
 		j += dj;
 		if (t[i][j] != jugador)
 			return false;
-	} while (c);
+	}
 
 	return true;
 }
@@ -24,8 +23,8 @@ static inline bool hay_ganador(const Tablero& t, int c) {
 
 	for (int i = 0; i < filas; i++)
 		for (int j = 0; j < columnas; j++) {
-			bool hay_espacio_e = columnas - j + 1 >= c;
-			bool hay_espacio_s = filas - i + 1 >= c;
+			bool hay_espacio_e = columnas - j >= c;
+			bool hay_espacio_s = filas - i >= c;
 			bool hay_espacio_se = hay_espacio_e && hay_espacio_s;
 			bool hay_espacio_sw = hay_espacio_s && j + 1 >= c;
 
