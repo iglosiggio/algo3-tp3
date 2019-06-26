@@ -336,7 +336,7 @@ int main (int argc, char** argv) {
 		cout << "\t fit   = torneo  | puntaje" << endl;
 		cout << "\t cross = moneda  | promedio" << endl;
 		cout << "\t mut   = normal  | uniforme" << endl;
-		cout << "\t sel   = mejores | sorteando" << endl;
+		cout << "\t sel   = mejores | sortear" << endl;
 		return 1;
 	}
 
