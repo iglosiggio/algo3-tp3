@@ -76,8 +76,11 @@ static void fitness_torneo(poblacion& ejemplares) {
 }
 
 static void fitness_puntaje(poblacion& ejemplares) {
+	/* Perder todas las partidas en el turno 0 */
+	const int minimo_puntaje = (-400 + -250) * 3 * 3;
+
 	for (struct ejemplar& ejemplar : ejemplares) {
-		ejemplar.fitness = puntuar(&ejemplar.params);
+		ejemplar.fitness = puntuar(&ejemplar.params) - minimo_puntaje;
 	}
 }
 
