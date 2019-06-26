@@ -45,7 +45,7 @@ static inline int min(int a, int b) {
 struct resultados juez(int cols, int rows, int c, int p, Jugador primero,
 	const void* ctx1, Jugador segundo, const void* ctx2) {
 	int turnos = min(2 * p, rows * cols);
-	Tablero partida(cols, vector<int>(rows, 0));
+	Tablero partida(rows, vector<int>(cols, 0));
 	Fichas fichas(cols, 0);
 
 	for (int i = 0; i < turnos; i++) {
