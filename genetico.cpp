@@ -170,7 +170,7 @@ static void mutacion_uniforme(struct scores& a) {
 }
 
 static void mutacion_normal(struct scores& a) {
-	std::uniform_real_distribution<float> normal(1, 0.05);
+	std::uniform_real_distribution<float> normal(1, 0.01);
 
 	a.posc3 *= normal(gen);
 	a.posc2 *= normal(gen);
@@ -280,6 +280,21 @@ static inline void imprimir_fitness(const poblacion& poblacion, int gen) {
 	     << mejor.bloqueos_c3 << "\t"
 	     << mejor.bloqueos_c2 << "\t"
 	     << mejor.bloqueos_c1 << endl;
+	for (const struct ejemplar& e : poblacion) {
+		const struct scores& s = e.params;
+		cout << "ejemplar\t"
+		     << gen << "\t"
+		     << e.fitness << "\t"
+		     << s.posc3 << "\t"
+		     << s.posc2 << "\t"
+		     << s.posc1 << "\t"
+		     << s.c3 << "\t"
+		     << s.c2 << "\t"
+		     << s.c1 << "\t"
+		     << s.bloqueos_c3 << "\t"
+		     << s.bloqueos_c2 << "\t"
+		     << s.bloqueos_c1 << endl;
+	}
 }
 
 template <class T>
@@ -344,7 +359,7 @@ int main (int argc, char** argv) {
 
 		/* 2. Selecciono un subconjunto de la población */
 		actual = selector.seleccionar(actual, K);
-		actual.resize(tamanio_poblacion);
+		actual.reserve(tamanio_poblacion);
 
 		/* Limpio los valores de fitness de los nuevos */
 		for (struct ejemplar& e : actual)
@@ -356,15 +371,31 @@ int main (int argc, char** argv) {
 		/* 3. Genero la nueva generación cruzando ejemplares */
 		for (int i = 0; i < K; i++)
 		for (int j = i + 1; j < K; j++) {
+			/* Cada pareja tiene 4 hijos */
 			struct scores params = cruzador.cruzar(
+				actual[i].params, actual[j].params
+			);
+			actual.push_back({params, 0});
+
+			params = cruzador.cruzar(
+				actual[i].params, actual[j].params
+			);
+			actual.push_back({params, 0});
+
+			params = cruzador.cruzar(
+				actual[i].params, actual[j].params
+			);
+			actual.push_back({params, 0});
+
+			params = cruzador.cruzar(
 				actual[i].params, actual[j].params
 			);
 			actual.push_back({params, 0});
 		}
 
 		/* 4. Muto los ejemplares */
-		for (struct ejemplar& e : actual)
-			mutador.mutar(e.params);
+		for (long unsigned i = K; i < actual.size(); i++)
+			mutador.mutar(actual[i].params);
 	}
 
 	return 0;
