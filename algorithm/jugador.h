@@ -19,6 +19,6 @@ struct scores {
 	int bloqueos_c1;
 };
 
-int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
+int evaluarTableros(Tablero& tablero, Fichas& fichas, int c, int p, int player,
 		    const void* ctx);
 #endif

@@ -10,10 +10,12 @@ struct contadores bloqueos {0, 0, 0, 0};
 struct contadores efectivos {0, 0, 0, 0};
 struct contadores posibles {0, 0, 0, 0};
 
+static inline
 int elegirEje(int valor, int eje, int c){
     return valor - eje * (c - 1);
 }
 
+static inline
 void actualizarContadores(struct contadores& contadores, int racha, int c) {
     if(racha >= c)
         contadores.C++;
@@ -25,7 +27,9 @@ void actualizarContadores(struct contadores& contadores, int racha, int c) {
         contadores.C3++;
 }
 
-void puntuar(int ejeX, int ejeY, Tablero tablero, Fichas fichas, int coljugada, int c, int p, int player){
+static inline
+void puntuar(int ejeX, int ejeY, const Tablero& tablero, const Fichas& fichas,
+	     int coljugada, int c, int p, int player) {
 
     int m = tablero[0].size();
     int n = tablero.size();
@@ -66,7 +70,8 @@ void puntuar(int ejeX, int ejeY, Tablero tablero, Fichas fichas, int coljugada, 
     }
 }
 
-int score(Tablero tablero, Fichas fichas, const struct scores* scores) {
+static inline
+int score(const struct scores* scores) {
     int score = 0;
     score += scores->posc3       * posibles.C3;
     score += scores->posc2       * posibles.C2;
@@ -80,9 +85,9 @@ int score(Tablero tablero, Fichas fichas, const struct scores* scores) {
     return score;
 }
 
-int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int c, int p,
-		  int player, const struct scores* scores) {
-
+static inline
+int puntuarJugada(const Tablero& tablero, const Fichas& fichas, int coljugada,
+		  int c, int p, int player, const struct scores* scores) {
     bloqueos  = {0, 0, 0, 0};
     efectivos = {0, 0, 0, 0};
     posibles  = {0, 0, 0, 0};
@@ -92,13 +97,13 @@ int puntuarJugada(Tablero tablero, Fichas fichas, int coljugada, int c, int p,
     puntuar(1, 1, tablero, fichas, coljugada, c, p, player);
     puntuar(1, -1, tablero, fichas, coljugada, c, p, player);
 
-    return score(tablero, fichas, scores);
+    return score(scores);
 
 }
 
-int puntuarEnemigo(Tablero tablero, Fichas fichas, int c, int p, int player,
-		    const struct scores* params) {
-
+static inline
+int puntuarEnemigo(const Tablero& tablero, const Fichas& fichas, int c, int p,
+		   int player, const struct scores* params) {
     int columns = tablero[0].size();
     int rows = tablero.size();
     int mejorPuntaje = INT32_MIN;
@@ -118,9 +123,8 @@ int puntuarEnemigo(Tablero tablero, Fichas fichas, int c, int p, int player,
     return mejorPuntaje;
 }
 
-int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
+int evaluarTableros(Tablero& tablero, Fichas& fichas, int c, int p, int player,
 		    const void* ctx) {
-
     int columns = tablero[0].size();
     int rows = tablero.size();
     int mejorPuntaje = INT32_MIN;
@@ -138,11 +142,6 @@ int evaluarTableros(Tablero tablero, Fichas fichas, int c, int p, int player,
             puntaje -= puntuarEnemigo(tablero, fichas, c, p, 2, params) / 2;
             fichas[col]--;
             tablero[fichas[col]][col] = 0;
-            
-            /* 
-            std::cerr << "col: " << col
-                      << " puntaje: " << puntaje << std::endl;
-            */
 
             if(mejorPuntaje < puntaje){
                 mejorPuntaje = puntaje;

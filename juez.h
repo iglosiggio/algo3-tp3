@@ -10,7 +10,7 @@ using std::vector;
 using Tablero = vector<vector<int>>;
 using Fichas = vector<int>;
 
-using Jugador = int (*)(Tablero, Fichas, int c, int p, int player,
+using Jugador = int (*)(Tablero&, Fichas&, int c, int p, int player,
 			const void* ctx);
 
 struct resultados {
