@@ -8,7 +8,7 @@ clean:
 	$(MAKE) -C src clean
 	rm -f tags
 
-torneo: torneo.cpp juez.cpp algorithm/jugador.cpp
+genetico: genetico.cpp juez.cpp algorithm/jugador.cpp
 
 grid: grid.cpp juez.cpp algorithm/jugador.cpp
 
