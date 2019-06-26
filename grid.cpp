@@ -74,6 +74,14 @@ int valores_b3[] = {20, 50, 80, 110};
 int valores_b2[] = {300, 400, 500, 600};
 int valores_b1[] = {333333};
 
+#define STATIC_ARRAY_SIZE(array) (sizeof (array) / sizeof ((array)[0]))
+
+const int total = STATIC_ARRAY_SIZE(valores_p3) * STATIC_ARRAY_SIZE(valores_p2)
+		* STATIC_ARRAY_SIZE(valores_p1) * STATIC_ARRAY_SIZE(valores_c3)
+		* STATIC_ARRAY_SIZE(valores_c2) * STATIC_ARRAY_SIZE(valores_c1)
+		* STATIC_ARRAY_SIZE(valores_b3) * STATIC_ARRAY_SIZE(valores_b2)
+		* STATIC_ARRAY_SIZE(valores_b1);
+
 #define PRINT_FIELD(val, field) \
 	std::cout << #field "\t" << val.field << std::endl
 
@@ -89,8 +97,6 @@ void imprimir_params(const struct scores& params, int puntaje) {
 	PRINT_FIELD(params,  bloqueos_c2);
 	PRINT_FIELD(params,  bloqueos_c1);
 }
-
-#define STATIC_ARRAY_SIZE(array) (sizeof (array) / sizeof ((array)[0]))
 
 #define PARTIDA(enemigo) \
 	struct resultados enemigo ## _ida = \
@@ -150,6 +156,7 @@ static int puntuar(const struct scores* params) {
 }
 
 int main (int argc, char** argv) {
+	int procesados = 0;
 	int mejor_puntaje = INT32_MIN;
 	struct scores mejores_params = {
 		valores_p3[0], valores_p2[0], valores_p1[0],
@@ -163,18 +170,22 @@ int main (int argc, char** argv) {
 	EACH(p1)
 	EACH(c3)
 	EACH(c2)
-	EACH(c1)
-	EACH(b3)
-	EACH(b2)
-	EACH(b1) {
-		struct scores params = {p3, p2, p1, c3, c2, c1, b3, b2, b1};
-		int puntaje = puntuar(&params);
-		if (puntaje > mejor_puntaje) {
-			mejor_puntaje = puntaje;
-			mejores_params = params;
+	EACH(c1) {
+		std::cout << "Procesados " << procesados << "/" << total
+			  << std::endl;
+		EACH(b3)
+		EACH(b2)
+		EACH(b1) {
+			struct scores params = {
+				p3, p2, p1, c3, c2, c1, b3, b2, b1
+			};
+			int puntaje = puntuar(&params);
+			if (puntaje > mejor_puntaje) {
+				mejor_puntaje = puntaje;
+				mejores_params = params;
+			}
 		}
 	}
-
 	imprimir_params(mejores_params, mejor_puntaje);
 	return 0;
 }
