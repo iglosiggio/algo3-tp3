@@ -59,10 +59,7 @@ struct config_partida {
 };
 
 /* Recorre los arreglos de valores de cada parámetro */
-#define EACH(param) \
-	for (int i = 0, param = valores_ ## param [0]; \
-	     i < STATIC_ARRAY_SIZE(valores_ ## param); \
-	     i++, param = valores_ ## param[i])
+#define EACH(param) for (int param : valores_ ## param)
 
 int valores_p3[] = {5, 10, 15, 20};
 int valores_p2[] = {15, 25, 35, 45};
