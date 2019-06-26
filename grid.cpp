@@ -75,7 +75,7 @@ int main (int argc, char** argv) {
 	EACH(c3)
 	EACH(c2)
 	EACH(c1) {
-		std::cout << "Procesados " << procesados << "/" << total
+		std::cerr << "Procesados " << procesados << "/" << total
 			  << std::endl;
 		EACH(b3)
 		EACH(b2)
