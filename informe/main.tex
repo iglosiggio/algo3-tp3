@@ -102,23 +102,33 @@
 
 \section{Introducción}
 
-% TODO: Tiene sentido plantear ejemplos y soluciones como en los otros TPs?
-
-En este Trabajo, se pretende poner en práctica los conceptos sobre heurísticas y metaheurísticas estudiados en la materia. Para ello, se trabajará sobre un área vastamente explorada en la reciente historia de la computación: la resolución de juegos, como pueden ser el ajedrez, las damas, entre otros, a través del uso de una computadora. En este caso, se centrará la atención en el \textit{C en línea}, un juego propuesto por la cátedra para este Trabajo, y que es, esencialmente, una generalización del clásico \textit{4 en línea}. Es decir, el juego consta de un tablero de $N$ columnas y $M$ filas, y dos jugadores (\textit{azul} y \textit{rojo}) que se enfrentan, por turnos alternados, para intentar conseguir que $C$ de sus fichas queden alineadas (ya sea de manera horizontal, vertical o diagonal) en el tablero.
-
-Así, el objetivo es implementar \textit{jugadores razonablemente buenos} de \textit{C en línea} que sean capaces de analizar el tablero de juego en un instante dado, y determinar cuál es la mejor jugada que se puede efectuar. Para esto, se deberá implementar un algoritmo de heurística golosa, utilizando una \textit{función parametrizable} que evalúe el estado del tablero para decidir la próxima jugada a realizar. Esto significa que se deberá considerar cuáles son los aspectos más relevantes a tener en cuenta para efectuar una jugada óptima en el \textit{C en línea}, y luego asignar a cada uno de estos \textit{parámetros} un \textit{peso} para calcular un valor numérico que represente qué tan buena es una cierta jugada, y así poder determinar cuál es la mejor.
-
-Dichos parámetros serán posteriormente optimizados, utilizando dos técnicas distintas, que serán debidamente explicadas en secciones posteriores.
-\begin{itemize}
-    \item Una heurística de búsqueda local basada en \textit{grid-search}.
-    \item Una metaheurística basada en un algoritmo genético.
-\end{itemize}
-
-La idea es que, a partir de las optimizaciones introducidas por estas dos soluciones, se obtengas dos jugadores de \textit{4 en línea}, que sean capaces de ganar a los jugadores provistos por la cátedra de manera consistente. La capacidad de los jugadores implementados será evaluada en la sección de Experimentación de este informe.
-
-Resulta interesante observar que el clásico juego del \textit{Ta-Te-Tí} es una instancia particular del \textit{C en línea} (donde $N = 3$, $M = 3$, $C = 3$), pero sin la restricción dada por la gravedad a la hora de colocar una ficha en el tablero. Esto es, en el \textit{C en línea} la ficha de un jugador caerá a la primera posición desocupada del tablero en una cierta columna elegida del mismo, a diferencia de lo que ocurre en el \textit{Ta-Te-Tí}, donde los jugadores pueden colocar sus fichas en cualquiera de las posiciones del tablero. Sin embargo, a pesar de esta diferencia, resultará útil tener en cuenta las consideraciones vistas en clase para diseñar un buen jugador de \textit{Ta-Te-Tí}, a la hora de implementar los algoritmos de este Trabajo.
-
-Sea como fuere, en este informe se documentará el proceso de la implementación realizada, explicando la elección de los parámetros a considerar, y las dos técnicas de optimización utilizadas. A su vez, se hará referencia a los métodos usados para evaluar qué tan bueno es un jugador respecto a otro, y se mostrarán los resultados obtenidos a partir de experimentación. Por último, en la última sección se mencionarán las conclusiones a las que se haya podido arribar luego del Trabajo.
+    \subsection{Descripción del problema}
+    
+    En este Trabajo, se pretende poner en práctica los conceptos sobre heurísticas y metaheurísticas estudiados en la materia. Para ello, se trabajará sobre un área vastamente explorada en la reciente historia de la computación: la resolución de juegos, como pueden ser el ajedrez, las damas, entre otros, a través del uso de una computadora. En este caso, se centrará la atención en el \textit{C en línea}, un juego propuesto por la cátedra para este Trabajo, y que es, esencialmente, una generalización del clásico \textit{4 en línea}. Es decir, el juego consta de un tablero de $N$ columnas y $M$ filas, y dos jugadores (\textit{azul} y \textit{rojo}) que se enfrentan, por turnos alternados, para intentar conseguir que $C$ de sus fichas queden alineadas (ya sea de manera horizontal, vertical o diagonal) en el tablero.
+    
+    Así, el objetivo es implementar \textit{jugadores razonablemente buenos} de \textit{C en línea} que sean capaces de analizar el tablero de juego en un instante dado, y determinar cuál es la mejor jugada que se puede efectuar. Para esto, se deberá implementar un algoritmo de heurística golosa, utilizando una \textit{función parametrizable} que evalúe el estado del tablero para decidir la próxima jugada a realizar. Esto significa que se deberá considerar cuáles son los aspectos más relevantes a tener en cuenta para efectuar una jugada óptima en el \textit{C en línea}, y luego asignar a cada uno de estos \textit{parámetros} un \textit{peso} para calcular un valor numérico que represente qué tan buena es una cierta jugada, y así poder determinar cuál es la mejor.
+    
+    Dichos parámetros serán posteriormente optimizados, utilizando dos técnicas distintas, que serán debidamente explicadas en secciones posteriores.
+    \begin{itemize}
+        \item Una heurística de búsqueda local basada en \textit{grid-search}.
+        \item Una metaheurística basada en un algoritmo genético.
+    \end{itemize}
+    
+    La idea es que, a partir de las optimizaciones introducidas por estas dos soluciones, se obtengas dos jugadores de \textit{4 en línea}, que sean capaces de ganar a los jugadores provistos por la cátedra de manera consistente. La capacidad de los jugadores implementados será evaluada en la sección de Experimentación de este informe.
+    
+    Resulta interesante observar que el clásico juego del \textit{Ta-Te-Tí} es una instancia particular del \textit{C en línea} (donde $N = 3$, $M = 3$, $C = 3$), pero sin la restricción dada por la gravedad a la hora de colocar una ficha en el tablero. Esto es, en el \textit{C en línea} la ficha de un jugador caerá a la primera posición desocupada del tablero en una cierta columna elegida del mismo, a diferencia de lo que ocurre en el \textit{Ta-Te-Tí}, donde los jugadores pueden colocar sus fichas en cualquiera de las posiciones del tablero. Sin embargo, a pesar de esta diferencia, resultará útil tener en cuenta las consideraciones vistas en clase para diseñar un buen jugador de \textit{Ta-Te-Tí}, a la hora de implementar los algoritmos de este Trabajo.
+    
+    Sea como fuere, en este informe se documentará el proceso de la implementación realizada, explicando la elección de los parámetros a considerar, y las dos técnicas de optimización utilizadas. A su vez, se hará referencia a los métodos usados para evaluar qué tan bueno es un jugador respecto a otro, y se mostrarán los resultados obtenidos a partir de experimentación. Por último, en la última sección se mencionarán las conclusiones a las que se haya podido arribar luego del Trabajo.
+    
+    
+    \subsection{Aclaraciones iniciales}
+    Antes de comenzar con el desarrollo del informe en sí, se realizará una serie de observaciones que se tuvieron en cuenta a la hora de la implementación y la explicación:
+        \begin{itemize}
+            \item Se hará referencia a las distintas variables numéricas del problema usando la notación introducida por el enunciado. Es decir, $N$ será la cantidad de columnas del tablero, $M$ la cantidad de filas, $p$ el total de fichas en la partida, y $C$ la cantidad de fichas que un jugador debe alinear para ganar.
+            \item No se entrará en demasiados detalles acerca de la implementación en el informe, por lo que para una mayor comprensión del funcionamiento de los procedimientos implementados, es recomendable dirigirse al código fuente que acompaña este informe.
+            \item Se supondrá que el valor de $C$ es menor o igual al mínimo entre $N$ y $M$, ya que de no ser así, las reglas del \textit{C en línea} descritas en el enunciado no podrían cumplirse, pues, por ejemplo: si $C > N$, no es posible alinear $C$ fichas horizontalmente.
+        \end{itemize}
+    
 
 \newpage
 
@@ -140,20 +150,21 @@ Sea como fuere, en este informe se documentará el proceso de la implementación
     
     \begin{breakablealgorithm}{\textbf{evaluarTableros}($tablero, C$) $\to$ $mejorColumna$}
     \begin{algorithmic}[1]
-		\State maxPuntaje $\gets$ 0     \Comment{$O(1)$}
-		\For{cada columna $col$ del $tablero$}        \Comment{$O(N)$ iteraciones}
+		\State maxPuntaje $\gets$ $- \infty$     \Comment{$O(1)$}
+		\For{columna $col$ en $tablero$}        \Comment{$O(N)$ iteraciones}
+		    \State puntaje $\gets$ \texttt{puntuarJugada}($tablero, C$)     \Comment{$O($\texttt{puntuarJugada}$)$}
 		    \State Colocar ficha en $col$       \Comment{$O(1)$}
-		    \State puntaje $\gets$ puntuarJugada($tablero, C$)     \Comment{$O($\texttt{puntuarJugada}$)$}
+		    \State puntaje $\gets$ puntaje - \texttt{puntuarEnemigo}($tablero, C$) $/ 2$     \Comment{$O($\texttt{puntuarEnemigo}$)$}
+		    \State Devolver el $tablero$ a su estado original       \Comment{$O(1)$}
 		    \If{$puntaje > maxPuntaje$}     \Comment{$O(1)$}
 		        \State maxPuntaje $\gets$ puntaje       \Comment{$O(1)$} 
 		        \State mejorColumna $\gets$ col         \Comment{$O(1)$}
 		    \EndIf
-		    \State Devolver el $tablero$ a su estado original       \Comment{$O(1)$}
         \EndFor
         \State \textbf{return} mejorColumna
         
         \medskip
-		\Statex \underline{Complejidad:} $O(N) \times O($\texttt{puntuarJugada}$)$
+		\Statex \underline{Complejidad:} $O(N) \times (O($\texttt{puntuarJugada}$) + O($\texttt{puntuarEnemigo}$))$
     \end{algorithmic}
     \end{breakablealgorithm}
     
@@ -163,32 +174,59 @@ Sea como fuere, en este informe se documentará el proceso de la implementación
     
     \subsection{Puntuando las jugadas}
     
-    El comportamiento de \texttt{evaluarTableros} es sencillo, pues consiste simplemente en aplicar \texttt{puntuarJugada} para cada una de las columnas del tablero. Esta función se encarga de detectar en el tablero cada uno de los parámetros elegidos para su evaluación. Es decir, cuenta la cantidad de veces que aparecerían los fenómenos considerados por los parámetros, en el tablero resultante de una jugada. A su vez, a cada uno de estos aspectos, que forman la función parametrizable, se le asigna un cierto \textit{peso}: un valor numérico, que representa la importancia que se le da a ese escenario en el estado de un tablero. En esta instancia del Trabajo, estos pesos fueron asignados \textit{a mano}, según criterios \textit{razonables} que se mencionarán a continuación. En etapas posteriores del Trabajo, estos serán optimizados utilizando distintas técnicas. Los parámetros en cuestión son:
+    El comportamiento de \texttt{evaluarTableros}, como se puede observar, consiste en: aplicar \texttt{puntuarJugada} para cada una de las columnas del tablero, obteniendo efectivamente un puntaje para cada jugada posible en ese estado del tablero. Luego, a ese valor numérico se le sustrae otro valor, relacionado con cómo evaluaría el jugador rival el tablero resultante de la jugada que se está analizando actualmente. Esto fue cuantificado como el puntaje calculado por \texttt{puntuarEnemigo} dividido 2, como se puede ver en el pseudocódigo. Es por eso que antes de invocar a este último procedimiento, se coloca la ficha del jugador en el tablero, para que se actualice su estado, y así poder evaluar el estado obtenido como consecuencia.
     
-    % TODO: Revisar explicaciones de los parámetros. Deberíamos incluir los pesos que asignamos arbitrariamente, o eso debería quedar en el código?
+    La función \texttt{puntuarJugada} se encarga de detectar en el tablero cada uno de los parámetros elegidos para su evaluación. Es decir, cuenta la cantidad de veces que ocurren los fenómenos considerados por los parámetros, teniendo en cuenta el estado actual del tablero. A su vez, a cada uno de estos aspectos, que forman la función parametrizable, se le asigna un cierto \textit{peso}: un valor numérico, que representa la importancia que se le da a ese escenario en el estado de un tablero. En esta instancia del Trabajo, estos pesos fueron asignados \textit{a mano}, según criterios \textit{razonables} que se mencionarán a continuación. En etapas posteriores del Trabajo, estos serán optimizados utilizando distintas técnicas.
+    
+    En cuanto a \texttt{puntuarEnemigo}, ésta invoca \texttt{puntuarJugada} por cada columna del tablero resultante, y se queda con el mejor puntaje calculado. Para explicar el método utilizado para calcular puntajes, es necesario primero mostrar cuáles fueron los parámetros considerados para la función parametrizable. Estos se pueden describir en base a qué escenario tratan de cuantificar en un tablero del juego, de la siguiente manera:
     
     \begin{itemize}
-        \item Que haya $x$ fichas del jugador alineadas (en cualquiera de las direcciones posibles). La idea de este parámetro es representar qué tan cerca está el jugador de ganar la partida. Se consideraron los casos siguientes:
+        \item Que haya $x$ fichas del jugador alineadas (en cualquiera de las direcciones posibles). La idea de este parámetro es representar qué tan cerca está el jugador de ganar la partida. Esto fue cuantificado utilizando un contador \texttt{efectivos} en el código del Trabajo (cada vez que se detecta una ocurrencia de uno de estos escenarios, se incrementa este valor). A continuación, los casos que fueron considerados:
             \begin{itemize}
-                \item $x = C$: esto significa que hay $C$ fichas alineadas del jugador, por lo que ganaría la partida. Evidentemente, este escenario es el ideal, y cualquier jugada que lleve a él será considerada óptima, ya que el objetivo del jugador es ganar el juego. Por lo tanto, el \textit{peso} asignado a este parámetro ha de ser el más alto (en el código que acompaña este informe, esto está representado por \texttt{efectivosC}, cuyo peso relativo es 10000).
-                \item $x = C-1$: al haber $C-1$ fichas alineadas del jugador, éste está considerablemente cerca de ganar la partida. Es cierto que el oponente podrá bloquearlo en el turno siguiente, pero en caso de que haya dos o más ocurrencias de este fenómeno, el jugador implementado podría ganar el juego, pues su oponente probablemente no pueda bloquear todas las líneas de $C-1$ fichas. Por lo tanto, el valor asignado a este parámetro es relativamente alto (representado por \texttt{efectivosC1}, con un peso de 300).
-                \item $x = C-2$: el escenario de $C-2$ fichas alineadas en el tablero fue el último que se decidió tener en cuenta en esta clase de parámetros, ya que se consideró que tiene una importancia no despreciable para el objetivo de ganar la partida. Sin embargo, no se consideraron $C-3$, $C-4$, etcétera, pues el peso que se les asignaría probablemente no cambiaría la elección de la jugada a realizar. Este parámetro se representa en el código como \texttt{efectivosC2}, y su peso asignado fue de 100.
+                \item[\textbf{1.1.}] $x = C-1$: esto significa que hay $C-1$ fichas alineadas del jugador, por lo que ganaría la partida en caso de ejecutar su jugada para conseguir los $C$ en línea. Evidentemente, este escenario es el ideal, y cualquier jugada que lleve a él será considerada óptima, ya que el objetivo del jugador es ganar el juego. Por lo tanto, el \textit{peso} asignado a este parámetro ha de ser el más alto.
+                \item[\textbf{1.2.}] $x = C-2$: al haber $C-2$ fichas alineadas del jugador, éste está considerablemente cerca de ganar la partida. Es cierto que el oponente podrá bloquearlo en el turno siguiente, pero en caso de que haya dos o más ocurrencias de este fenómeno, el jugador implementado podría ganar el juego, pues su oponente probablemente no pueda bloquear todas las líneas de $C-2$ fichas. Por lo tanto, el valor asignado a este parámetro es relativamente alto.
+                \item[\textbf{1.3.}] $x = C-3$: el escenario de $C-3$ fichas alineadas en el tablero fue el último que se decidió tener en cuenta en esta clase de parámetros, ya que se consideró que tiene una importancia no despreciable para el objetivo de ganar la partida. Sin embargo, no se consideraron $C-4$, $C-5$, etcétera, pues el peso que se les asignaría probablemente no cambiaría la elección de la jugada a realizar.
             \end{itemize}
-        \item Que haya $x$ posiciones en el tablero que estén ocupadas por fichas del jugador que invocó a la función, o bien que estén desocupadas. Esto representa un escenario más débil que los parámetros descritos anteriormente, ya que contempla casos en los que no hay fichas en ciertos casilleros del tablero, los cuales pueden ser aprovechados por el jugador en turnos subsiguientes para colocar sus fichas. Naturalmente, el peso asignado a estos parámetros será menor, en comparación con los tres anteriores, ya que no son tan determinantes a la hora de elegir qué jugada ejecutar. Sin embargo, hacen que el jugador implementado tenga en cuenta los espacios vacíos del tablero, lo cual puede ser útil dentro de varios turnos, dependiendo de las jugadas de su oponente. Utilizando esta lógica, se tuvo en cuenta los siguientes casos, con explicaciones similares a los parámetros ya explicados:
+        \item Que haya $x$ posiciones en el tablero que estén ocupadas por fichas del jugador que invocó a la función, o bien que estén desocupadas. Esto representa un escenario más débil que los parámetros descritos anteriormente, ya que contempla casos en los que no hay fichas en ciertos casilleros del tablero, los cuales pueden ser aprovechados por el jugador en turnos subsiguientes para colocar sus fichas. Naturalmente, el peso asignado a estos parámetros será menor, en comparación con los tres anteriores, ya que no son tan determinantes a la hora de elegir qué jugada ejecutar. Sin embargo, hacen que el jugador implementado tenga en cuenta los espacios vacíos del tablero, lo cual puede ser útil dentro de varios turnos, dependiendo de las jugadas de su oponente. Utilizando esta lógica, se tuvo en cuenta los siguientes casos, representados por la variable \texttt{posibles} en el programa, y con explicaciones similares a los parámetros ya explicados:
             \begin{itemize}
-                \item $x = C$: esto no significa que al efectuar la jugada se obtendrían $C$ fichas en línea, sino que sería factible que eso ocurra más adelante (si es que el oponente no actúa de acuerdo a ello). Entonces, puede ser de utilidad conocer esta situación para elegir entre dos o más jugadas que puntuasen de igual manera con los otros parámetros definidos hasta ahora. Este escenario es contemplado usando \texttt{posiblesC} en el código, y el peso asignado fue de 20.
-                \item $x = C-1$: es la misma idea que se describió en el ítem anterior, pero más débil. Por lo tanto, el peso asignado será relativamente menor: 15 (\texttt{posiblesC1} en el código).
-                \item $x = C-2$: equivalentemente, representa la posibilidad de que el jugador pueda obtener $C-2$ fichas propias alineadas en un turno futuro. El peso asignado es también menor, habiendo elegido el valor 10 (ver \texttt{posiblesC2} en el código del Trabajo).
+                \item[\textbf{2.1.}] $x = C-1$: esto no significa que al efectuar la jugada siguiente se obtendrían $C$ fichas en línea, sino que sería factible que eso ocurra más adelante (si es que el oponente no actúa de acuerdo a ello). Entonces, puede ser de utilidad conocer esta situación para elegir entre dos o más jugadas que puntuasen de igual manera con los otros parámetros definidos hasta ahora. Por eso, tiene importancia suficiente como para tenerlo en cuenta, pero su peso relativo sería considerablemente más bajo que el de los fenómenos descritos antes.
+                \item[\textbf{2.2.}] $x = C-2$: es la misma idea que se describió en el ítem anterior, pero más débil. Por lo tanto, el peso asignado será relativamente menor.
+                \item[\textbf{2.3.}] $x = C-3$: equivalentemente, representa la posibilidad de que el jugador pueda obtener $C-3$ fichas propias alineadas en un turno futuro. El peso asignado será también menor.
             \end{itemize}
-        \item Cabe remarcar que los dos tipos de parámetros mencionados hasta ahora son de carácter meramente ofensivo; es decir, al usarlos, el jugador se enfoca en ganar la partida. Sin embargo, esto sería insuficiente: es necesario considerar que existe un oponente, que también intentará ganar el juego. Por lo tanto, se incluye también una serie de parámetros de índole defensiva, que representan el escenario siguiente: al efectuar una jugada, el jugador bloqueará una secuencia de $x$ fichas del oponente, impidiéndole llegar a alinear $C$ fichas, en la medida de lo posible. Así, se puede implementar una estrategia de defensa, basada en bloquear las líneas del rival. A pesar de la importancia de esto, el peso asignado a estos parámetros es menor con respecto a los primeros tres (que estaban claramente orientados a ganar); la razón de esto es que el objetivo del jugador que se desea implementar es vencer a sus oponentes. Por eso, tiene sentido darle mayor importancia a las variables relacionadas con la victoria. Sea como fuere, los parámetros defensivos que se consideraron son:
+        \item Cabe remarcar que los dos tipos de parámetros mencionados hasta ahora son de carácter meramente ofensivo; es decir, al usarlos, el jugador se enfoca en ganar la partida. Sin embargo, esto sería insuficiente: es necesario considerar que existe un oponente, que también intentará ganar el juego. Por lo tanto, se incluye también una serie de parámetros de índole defensiva, que representan el escenario siguiente: al efectuar una jugada, el jugador bloqueará una secuencia de $x$ fichas del oponente, impidiéndole llegar a alinear $C$ fichas, en la medida de lo posible. Así, se puede implementar una estrategia de defensa, basada en bloquear las líneas del rival. A pesar de la importancia de esto, el peso asignado a estos parámetros es menor con respecto a los primeros tres (que estaban claramente orientados a ganar); la razón de esto es que el objetivo del jugador que se desea implementar es vencer a sus oponentes. Por eso, tiene sentido darle mayor importancia a las variables relacionadas con la victoria. Sea como fuere, los parámetros defensivos que se consideraron son los siguientes (esto se refleja en el contador \texttt{bloqueos} en el código fuente):
             \begin{itemize}
-                \item $x = C-1$: si esta situación es detectada por el jugador al evaluar el estado del tablero, significa que le está impidiendo al rival ganar la partida; es decir, de no efectuar esta jugada, el oponente le vencerá (a no ser que el jugador pueda ganar antes). Por lo tanto, el peso de este parámetro deberá ser alto, pero no tan alto como el de ganar el juego. En el código, este parámetro se implementa con la variable \texttt{bloqueosC1}, y el peso que se le asignó es de 3000.
-                \item $x = C-2$: bloquear una cadena de $C-2$ fichas del rival también es importante, pues es muy probable que, de no hacerlo, éste pueda acercarse peligrosamente a ganar la partida en el siguiente turno. Por ejemplo, bloquear una cadena de 2 horizontales fichas en un juego de \textit{4 en línea} es importante, pues si el oponente logra alinear 3 fichas, bloquearlo en el turno siguiente puede ser inútil, pues aunque se le bloquee una forma de alinear 4 fichas, posiblemente tenga otra manera (si y sólo si la cadena de fichas no toca ninguno de los extremos del tablero). Por consiguiente, el peso para este parámetro no puede ser muy bajo: así, se eligió el valor 200 (ver \texttt{bloqueosC2}). Observar que este valor es menor que el de \texttt{efectivosC1}, pues es más importante alinear $C-1$ fichas propias en pos de intentar ganar la partida.
-                \item $x = C-3$: este parámetro es menos importante, ya que si se le diese un peso muy alto, el jugador implementado se ocuparía demasiado de bloquear un escenario que puede ser muy frecuente en el juego, pero no prioritario, provocando que desatienda la meta de vencer al oponente, dedicándose casi exclusivamente a defenderse del rival. Por eso, el peso asignado a este parámetro, contabilizado con \texttt{bloqueosC3}, es de 20.
+                \item[\textbf{3.1.}] $x = C-1$: si esta situación es detectada por el jugador al evaluar el estado del tablero, significa que le está impidiendo al rival ganar la partida; es decir, de no efectuar esta jugada, el oponente le vencerá (a no ser que el jugador pueda ganar antes). Por lo tanto, el peso de este parámetro deberá ser alto, pero no tan alto como el de ganar el juego.
+                \item[\textbf{3.2.}] $x = C-2$: bloquear una cadena de $C-2$ fichas del rival también es importante, pues es muy probable que, de no hacerlo, éste pueda acercarse peligrosamente a ganar la partida en el siguiente turno. Por ejemplo, bloquear una cadena de 2 horizontales fichas en un juego de \textit{4 en línea} es importante, pues si el oponente logra alinear 3 fichas, bloquearlo en el turno siguiente puede ser inútil, pues aunque se le bloquee una forma de alinear 4 fichas, posiblemente tenga otra manera (si y sólo si la cadena de fichas no toca ninguno de los extremos del tablero). Por consiguiente, el peso para este parámetro no puede ser muy bajo, pero sí debería ser menor que el primero de los mencionados, pues es más importante alinear $C-1$ fichas propias en pos de intentar ganar la partida.
+                \item[\textbf{3.3.}] $x = C-3$: este parámetro es menos importante, ya que si se le diese un peso muy alto, el jugador implementado se ocuparía demasiado de bloquear un escenario que puede ser muy frecuente en el juego, pero no prioritario, provocando que desatienda la meta de vencer al oponente, dedicándose casi exclusivamente a defenderse del rival.
             \end{itemize}
     \end{itemize}
     
-    Los pesos asignados a cada uno de estos parámetros forman una configuración posible de la función paramétrica; en particular, se trata de una configuración de carácter goloso. Así, se utilizarán estos valores numéricos para generar una puntuación para cada jugada posible. Este puntaje es producido por la función \texttt{score}, y es calculado realizando la suma de cada uno de los pesos multiplicado por la cantidad de ocurrencias de los fenómenos a los que se asocia. Formalmente:
+    Los pesos asignados a cada uno de estos parámetros forman una configuración posible de la función paramétrica; en particular, se trata de una configuración de carácter goloso. Asimismo, es posible planificar estrategias de juego golosas para el jugador implementado, según que peso relativo se le dé a cada parámetro considerado. Estas son las configuraciones golosas que se diseñaron en base a asignar pesos diferentes a los parámetros, dando como resultado distintos jugadores que utilizan estos valores para elegir, en cada paso, la jugada a realizar:
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
+		\hline
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2 &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+		    Agresiva &  1000000 &  500 &  200 &  20 &  15 &  5 &  333333 &  300 &  20 \\ \hline
+		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
+		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    \underline{Observaciones}:
+        \begin{itemize}
+            \item Los números encabezando las columnas se corresponden con los usados para enumerar los parámetros considerados más arriba.
+            \item En todas las estrategias, hay dos valores que se mantienen constantes:
+                \begin{itemize}
+                    \item El peso del parámetro 1.1., correspondiente a aquellas situaciones en que haya $C-1$ fichas del jugador alineadas en el tablero. Como se comentó antes, esta clase de escenario es ideal, ya que representaría la victoria del jugador. Como en todas las configuraciones el objetivo sigue siendo ganar la partida, este peso se mantiene alto e inalterado en todas ellas.
+                    \item El peso del parámetro 3.1., que hace referencia a bloquear $C-1$ fichas alineadas del oponente. Esto significa evitar que éste gane la partida, por lo que también mantiene su importancia a través de todas las configuraciones. En cuanto a su valor, se le asignó la tercera parte del valor asociado al parámetro 1.1., ya que su importancia, aunque alta, no debe evitar que el jugador gane la partida cuando puede hacerlo.
+                \end{itemize}
+            \item La configuración \textit{agresiva} da especial importancia a los primeros tres parámetros, ya que son los relacionados con intentar alinear $C$ fichas en el tablero. Así, este jugador no se preocupará tanto por defenderse del rival, sino que simplemente se dedicará a vencerlo antes de que él haga lo propio.
+            \item La configuración \textit{bloqueadora} se caracteriza por ser más defensiva, dado relativamente menos importancia a los parámetros asociados a alinear fichas propias, y asignando mucho más peso a intentar bloquear las jugadas del oponente, para evitar que éste le venza.
+            \item La configuración \textit{al medio} asigna más peso a tener a disposición posibles posiciones en las que colocar sus fichas. Este fenómeno se da mayoritariamente en las columnas centrales del tablero, ya que hay más lugares desplegados a ambos lados de estas posiciones. Esto puede ser una estrategia interesante, ya que puede impedir que el oponente alinee $C$ fichas, a partir de tratar de \textit{monopolizar} el centro del tablero, por donde van a tener que pasar los intentos del oponente.
+        \end{itemize}
+
+    Así, se utilizarán estos valores numéricos para generar una puntuación para cada jugada posible. Este puntaje es producido por la función \texttt{score}, y es calculado realizando la suma de cada uno de los pesos multiplicado por la cantidad de ocurrencias de los fenómenos a los que se asocia. Más formalmente:
     
     \begin{center}
         \texttt{PUNTAJE}($J$) =  $\sum_{i \in \Pi} \#ocurrencias_{i}(J) \times peso_{i} $ 
@@ -201,23 +239,44 @@ Sea como fuere, en este informe se documentará el proceso de la implementación
         \item $\#ocurrencias_{i}(J)$ es la cantidad de veces que se detectó el fenómeno representado por $i$ en la jugada $J$.
         \item $peso_{i}$ es el peso que se le asignó al parámetro $i$.
     \end{itemize}
-    
-    Falta por explicar la forma en la que se calcula la cantidad de ocurrencias para los distintos parámetros. Para ello, se buscan cadenas de $x$ fichas (o espacios libres, según corresponda) en el tablero. Esto se delega a cuatro procedimientos:
-        \begin{itemize}
-            \item \texttt{puntuarHorizintal}: busca $x$ alineados en horizontal.
-            \item \texttt{puntuarVertical}: busca $x$ alineados en vertical.
-            \item \texttt{puntuarDiagonalNE} (NE: noreste): busca $x$ alineados en diagonal, con dirección $\langle$ izquierda, abajo $\rangle$ hacia $\langle$ derecha, arriba $\rangle$.
-            \item \texttt{puntuarDiagonalSE} (SE: sudeste): busca $x$ alineados en diagonal, con dirección $\langle$ izquierda, arriba $\rangle$ hacia $\langle$ derecha, abajo $\rangle$.
-        \end{itemize}
+
+    A su vez, la función \texttt{score} toma su información de \texttt{puntuar}, una función que se invoca cuatro veces dentro de \texttt{puntuarJugada}. Cada una de esas veces corresponde a una de las cuatro direcciones en las que se pueden alinear las fichas: horizontal, vertical, y las dos diagonales. Dependiendo de cómo sea invocada, \texttt{puntuar} buscará líneas de fichas y espacios libres en alguna de las cuatro direcciones. Entrar en detalles de la implementación de esta búsqueda no resulta relevante, ya que consiste simplemente en recorrer y leer el tablero, cosa que escapa el alcance de este informe.
         
-    Luego, el funcionamiento de \texttt{puntuarJugada} consiste simplemente en invocar a estas cuatro funciones enumeradas, para obtener la cantidad de ocurrencias correspondiente a cada uno de los parámetros. Esta información es tomada por \texttt{score}, que calcula la puntuación de cada una de las posibles jugadas, y así es como se decide cuál es la próxima a realizar para cada estado del tablero de \textit{C en línea}.
+    Luego, el funcionamiento de \texttt{puntuarJugada} consiste simplemente en usar la información provista por \texttt{puntuar}, para obtener la cantidad de ocurrencias correspondiente a cada uno de los parámetros. Esta información es tomada por \texttt{score}, que calcula la puntuación de cada una de las posibles jugadas, y así es como se decide cuál es la próxima a realizar para cada estado del tablero de \textit{C en línea}.
     
     Una vez determinada la mejor jugada, se transmite al \textit{Juez} la columna en la que el jugador decidió colocar su ficha. Este Juez sera el encargado de llevar adelante la partida, administrando los turnos, registrando las jugadas que se van generando y terminando la partida en el caso de que haya un ganador identificando al mismo. El mismo fue provisto por la cátedra, y fue reimplementado en lenguaje \texttt{C++} por el grupo, para poder realizar la experimentación necesaria para evaluar las optimizaciones que se hará sobre los parámetros en etapas posteriores del desarrollo.
     
     
     \subsection{Complejidad temporal}
     
-    % TODO: Justificar O(NxM)
+    Como ya se mencionó en el pseudocódigo, la complejidad temporal de la función que evalúa todos los posibles estados del tablero es de $O(N) \times (O($\texttt{puntuarJugada}$) + O($\texttt{puntuarEnemigo}$))$. Esto es porque se realizan $N$ iteraciones (una por cada columna del tablero, correspondiente a cada jugada posible), y en cada iteración se invocan estos dos procedimientos. El requerimiento, en cuanto a complejidad, demandado por este Trabajo es que: \textit{la función que, dado un estado cualquiera de un tablero, determine la próxima jugada a realizar} tenga complejidad cómo máximo $O(N \times M)$. 
+    
+    Por lo tanto, se debe justificar que $(O($\texttt{puntuarJugada}$) + O($\texttt{puntuarEnemigo}$)) \in O(N \times M)$, pues las funciones que se encargan, por cada tablero posible, de analizar la mejor jugada a realizar, son esas dos. La complejidad de \texttt{puntuarJugada} es la de invocar cuatro veces a la función \texttt{puntuar}. Esta última realiza $O(C)$ iteraciones, por la manera en la que recorre el tablero. En cada iteración, no hace más que modificar variables que llevan cuenta de la cantidad de ocurrencias de cada parámetro. Por lo tanto, su complejidad es $O(C)$. Esto significa que la complejidad de \texttt{puntuarJugada} es de $4\times O(C)$ $\in$ $O(C)$.
+    
+    Notar que esta última complejidad no está dependiendo ni de $N$ ni de $M$. Sin embargo, como se mencionó al principio de este informe, vale que $C \leq min(N, M)$. Por lo tanto, en particular, $C \leq M$. Esto significa que:
+    
+    \begin{center}
+        $O($\texttt{puntuarjugada}$)$ $=$ $4 \times O($\texttt{puntuar}$)$ $\in O($\texttt{puntuar}$) = O(C) \in O(M)$
+        
+        Entonces, $O($\texttt{puntuarJugada}$) \in O(M)$
+    \end{center}
+    
+    Ahora bien, como se habíá explicado previamente, \texttt{puntuarEnemigo} es una función que realiza $O(N)$ iteraciones, ya que calcula el puntaje de cada uno de los estados resultantes del tablero; esto es, una vez por cada columna. Luego:
+    
+    \begin{center}
+        $O($\texttt{puntuarEnemigo}$) = O(N) \times O($\texttt{puntuar}$)$
+        
+        Por lo tanto, por lo visto arriba: $O($\texttt{puntuarEnemigo}$) = O(N) \times O(M) \in O(N \times M)$
+    \end{center}
+    
+    En conclusión, la complejidad de analizar y decidir la mejor jugada, dado un estado del tablero, es de:
+    
+    \begin{center}
+        $O($\texttt{puntuarJugada}$) + O($\texttt{puntuarEnemigo}$) \in O(M) + O(N \times M) \in O(N \times M)$
+    \end{center}
+    
+    Con lo cual, queda justificada la complejidad temporal pedida.
+    
     
 
 \newpage
@@ -226,6 +285,20 @@ Sea como fuere, en este informe se documentará el proceso de la implementación
 
 
 \section{Optimización de los parámetros 1: \textit{grid-search}}
+
+    \subsection{Funcionamiento de la heurística}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    \subsection{Resultados obtenidos}
 
 
 
