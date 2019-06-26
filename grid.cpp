@@ -184,6 +184,7 @@ int main (int argc, char** argv) {
 				mejor_puntaje = puntaje;
 				mejores_params = params;
 			}
+			procesados++;
 		}
 	}
 	imprimir_params(mejores_params, mejor_puntaje);
