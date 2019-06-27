@@ -2,6 +2,7 @@
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel} 
+\decimalpoint
 \usepackage{a4wide} 
 \usepackage{caratula}
 \usepackage{afterpage}
@@ -25,6 +26,10 @@
 \usepackage{fancyhdr}
 \usepackage{lastpage}
 \usepackage{algorithmicx, algpseudocode, algorithm}
+
+
+%----------Nuevo comando para hacer un comentario de linea completa en pseudocódigo --------------
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
 
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +141,7 @@
 %----------------------------------------------------------------------------------------------------------
 
 
-\section{Heurística Golosa}
+\section{Heurística golosa}
 
 
 	
@@ -287,23 +292,98 @@
 \section{Optimización de los parámetros 1: \textit{grid-search}}
 
     \subsection{Funcionamiento de la heurística}
+    En esta segunda parte del desarrollo, se utilizó la técnica de \textit{grid-search} para optimizar los parámetros propuestos y explicados en la sección anterior. Es decir, se intentó conseguir que los pesos asignados a cada uno de los parámetros sean \textit{buenos}, en el sentido de que el jugador que los utilice como \textit{estrategia} de juego sea capaz de vencer al jugador de la cátedra de manera consistente.
     
+    Para conseguir esto, primero se definió un conjunto de valores posibles para cada parámetro considerado. El criterio en la elección de estos valores se corresponde con lo expuesto en el momento de presentar los parámetros en el apartado anterior de este informe; esto es, teniendo en cuenta que el objetivo principal del algoritmo es que el jugador pueda ganar la partida, pero también asignando importancia a defenderse de que su rival lo venza. A continuación, se enumeran los diferentes valores considerados para cada parámetro, sobre los cuales se aplicará el \textit{grid-search}:
     
+        \begin{itemize}
+            \item $V_{1.1.} =  \{1000000\} $
+            \item $V_{1.2.} =  \{400, 500, 600\} $
+            \item $V_{1.3.} =  \{150, 200, 250\} $
+            \item $V_{2.1.} =  \{20, 30, 40, 50\} $
+            \item $V_{2.2.} =  \{15, 25, 35, 45\} $
+            \item $V_{2.3.} =  \{5, 10, 15, 20\} $
+            \item $V_{3.1.} =  \{333333\} $
+            \item $V_{3.2.} =  \{300, 400, 500, 600\} $
+            \item $V_{3.3.} =  \{20, 50, 80, 110\} $
+        \end{itemize}
+    donde $V_{i}$ es el conjunto de los valores considerados para el parámetro $i$.
     
+    Luego, una vez determinados los valores que puede tomar cada parámetro, se utilizará \textit{grid-search} para elegir qué combinación de ellos es la que produce mejores jugadas. Para eso, se probarán todas las posibilidades de pesos para cada parámetro (dentro de los conjuntos $V_{i}$ definidos arriba), y se obtendrá el puntaje obtenido para la configuración actual de parámetros. Este puntaje se calcula utilizando al \textit{Juez} (función \texttt{juez} definida en el archivo \texttt{juez.cpp}), que: dados los valores de $N$, $M$, $C$ y $p$, además de dos jugadores con sus correspondientes configuraciones de parámetros, hace que se juegue una partida con dichos datos, y retorna un valor distinto por cada resultado posible (victoria de jugador azul, victoria del rojo, o empate).
     
+    Por cada combinación posible de valores para los parámetros, se simulan varias partidas, con diferentes tamaños de tablero. Así, por cada tablero, el jugador que utiliza la combinación de parámetros en cuestión, se enfrenta dos veces a cada uno de los jugadores que usan las tres configuraciones golosas definidas anteriormente (recordar que estas eran \textit{agresiva}, \textit{bloqueadora} y \textit{al medio}): una vez empieza él, y la otra vez empieza el rival. Esto se hizo de esta manera ya que el jugador que empieza la partida puede tener ventaja sobre su oponente. Por este motivo, se puntúa de forma diferente un resultado dependiendo de si el jugador empezó o no, siguiendo el siguiente esquema:
     
+    \begin{center}
+		\begin{tabular}{ | c || c | c | }
+		\hline
+		Resultado &  Jugó primero &  Jugó segundo \\ \hhline{|=#=|=|}
+		    Victoria &  $250 - t$ &  $500 - t$ \\ \hline
+		    Empate &  $0$ &  $100$ \\ \hline
+		    Derrota &  $-400 + t$ &  $-250 + t$ \\ \hline
+		\end{tabular}
+    \end{center}
     
+    En esta tabla, se puede ver el puntaje que se asigna a una configuración de parámetros según si el jugador que la utilizó empezó jugando la partida, o fue su rival el primero. El valor $t$ es igual a la cantidad de turnos que duró la partida, dividido dos. Se incluyó esto en las puntuaciones para darle valor a que el jugador gane la partida lo antes posible (a menos turnos, mayor puntaje por victoria), o que dé la mayor cantidad de \textit{pelea} antes de ser vencido (a más turnos, mayor puntaje por derrota). También se puede observar que, como se dijo antes, es más valioso ganar si empezó jugando el rival, y además es menos grave perder o empatar en esos casos.
     
+    De todo esto se encarga la función \texttt{puntuar} (definida en \texttt{puntuar\_params.h}), que calcula el puntaje del jugador en evaluación después de disputar las seis partidas por cada tablero diferente (dos contra cada rival). Expresado más formalmente, el puntaje se calcula de la siguiente manera:
     
+    \begin{center}
+        \texttt{puntuar}($\pi$) $=$ $\sum_{i = 1}^{\#partidas} \sum_{\rho \in R} \ empiezoYo(\pi, \rho) + empiezaEl(\pi, \rho)$ 
+    \end{center}
+    donde:
+        \begin{itemize}
+            \item $\pi$ es el jugador que utiliza la configuración de valores para los parámetros que se está analizando.
+            \item $\#partidas$ es la cantidad de tableros diferentes sobre los que se juegan las partidas.
+            \item $\rho$ es cada uno de los tres jugadores golosos creados.
+            \item $R$ es el conjunto que reúne a estos tres jugadores golosos.
+            \item $empiezoYo$ y $empiezaEl$ calculan el puntaje correspondiente a victoria, empate o derrota en la $i$-ésima partida entre los jugadores $\pi$ y $\rho$ (dependiendo de quién empezó jugando, de acuerdo a la tabla mostrada antes).
+        \end{itemize}
+        
+    Ahora, una vez explicado el proceso por el cual se evalúa una combinación de los nueve parámetros propuestos, se mostrará el pseudocódigo correspondiente al \textit{grid-search}. Sea $W = \{1.1., 1.2., 1.3., 2.1., 2.2., 2.3., 3.1., 3.2., 3.3. \}$ un conjunto con el identificador de cada parámetro definido, esta función considera todos los posibles valores en $V_{i}$, con $i \in W$ (es decir, cada valor posible para cada parámetro definido), y, para cada combinación posible, puntúa la configuración de acuerdo al procedimiento explicado arriba.
+    
+    \begin{breakablealgorithm}{\textbf{grid-search} $\to$ $mejoresParametros$}
+    \begin{algorithmic}[1]
+        
+        \State mejorPuntaje $\gets$ $ - \infty$
+        \For{$v \in V_{i} \ \forall i \in W$}
+            \State $\pi$ $\gets$ jugador con la configuración actual
+            \State puntaje $\gets$ \texttt{puntuar}($\pi$)
+            \If{puntaje > mejorPuntaje}
+                \State mejorPuntaje $\gets$ puntaje
+                \State mejoresParametros $\gets$ configuración actual
+            \EndIf
+        \EndFor
+        \State \textbf{return} mejoresParametros
+        
+    \end{algorithmic}
+    \end{breakablealgorithm}
+    
+    De esta forma es como la técnica de \textit{grid-search} se encarga de elegir que combinación de valores para los parámetros da los mejores resultados según la evaluación diseñada. Como se puede ver, las combinaciones posibles son muchas, ya que hay que considerar cada valor posible para cada uno de los nueve parámetros. Por lo tanto, el tiempo consumido por esta búsqueda será inevitablemente alto. Es por este motivo que se eligieron conjuntos de valores posibles relativamente pequeños, ya que si no esta implementación sería difícilmente viable, sobre todo teniendo en cuenta el tiempo disponible para pruebas.
     
     
     
     \subsection{Resultados obtenidos}
+    
+    El mayor puntaje obtenido a partir de la búsqueda con \textit{grid-search} que se mostró anteriormente fue de 7896, y la combinación de valores para los parámetros que obtuvo dicha puntuación es la siguiente. Se agregan también los valores para los parámetros de los tres jugadores golosos definidos en la primera sección del informe, para mayor facilidad de comparación:
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
+		\hline
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2 &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+		    Agresiva &  1000000 &  500 &  200 &  20 &  15 &  5 &  333333 &  300 &  20 \\ \hline
+		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
+		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
+		    Grid-search &  1000000 &  500 &  250 &  20 &  15 &  20 &  333333 &  300 &  110 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    A partir de los resultados de la optimización de los parámetros, se podría afirmar que:
+        \begin{itemize}
+            \item Los valores asignados a los parámetros de tipo 1 (1.1., 1.2. y 1.3.) están muy cerca de los que se había propuesto para el jugador con \textit{estrategia agresiva}, por lo que es posible concluir que la postura de priorizar las jugadas en las que se intenta alinear fichas propias es acertada, según lo calculado por el \textit{grid-search}.
+            \item La importancia del parámetro 2.3. es mayor a lo que se esperaba, ya que el valor asignado a él por el \textit{grid-search }fue mayor que en cualquiera de las configuraciones golosas.
+            \item Bloquear las líneas de fichas del oponente obtuvo un peso relativo similar al de la \textit{estrategia agresiva}, con la salvedad del parámetro 3.3., que es considerablemente más alto. Los resultados producidos por estas diferencias en los parámetros podrán ser analizados con mayor profundidad al momento de realizar la experimentación.
+        \end{itemize}
 
-
-
-	
-	
 \newpage
 
 %----------------------------------------------------------------------------------------------------------
