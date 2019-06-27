@@ -86,8 +86,8 @@
 
 
 \integrante{Lucas M. Soltz}{205/17}{lucas.m.soltz@gmail.com}
-\integrante{Federico A. Sabatini}{NNN/YY}{------}
-\integrante{Ignacio E. Losiggio}{NNN/YY}{------}
+\integrante{Federico A. Sabatini}{579/17}{sabatinifedericoagustin@gmail.com}
+\integrante{Ignacio E. Losiggio}{751/17}{iglosiggio@dc.uba.ar}
 \integrante{Tomás Capdevielle}{245/17}{tomas.capdevielle@gmail.com}
 
 \maketitle
@@ -316,7 +316,7 @@
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | }
 		\hline
-		tipo de tablero &  c &  columnas & filas & p \\ \hhline{|=#=|=|=|=|}
+		Tipo de tablero &  $C$ &  $N$ & $M$ & p \\ \hhline{|=#=|=|=|=|}
 		    Cuadrado & $\{3..10\}$ &  $(2 * C)$ & $(2 * C) - 1$ & $ (n * m)$ \\ \hline
 		    Rectángulo Horizontal & $\{3..10\}$ &  $(3 * C)$ &  $(3/2 * C)$ & $ (n * m)$ \\ \hline
 		\end{tabular}
@@ -473,7 +473,7 @@
     
     \subsection{Resultados obtenidos}
     
-    Después de ejecutar el algoritmo genético y que transcurran 26 generaciones, los valores de los parámetros convergieron a la siguiente configuración, que obtuvo un \textit{fitness} de 9418. Al igual que se hizo con los resultados de \textit{grid-search}, se incluyen tambien las combinaciones de parámetros vistas anteriormente, para comparar de manera sencilla.
+    Después de ejecutar el algoritmo genético (usando la función de \textit{fitness} \textbf{Puntaje}, la operación de \textit{crossover} \textbf{Moneda}, el mutador \textbf{Normal} y el método de selección \textbf{Mejores})  y que transcurran 100 generaciones, los valores de los parámetros convergieron a la siguiente configuración, que obtuvo un \textit{fitness} de 9419. Al igual que se hizo con los resultados de \textit{grid-search}, se incluyen tambien las combinaciones de parámetros vistas anteriormente, para comparar de manera sencilla.
     
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
@@ -483,7 +483,7 @@
 		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
 		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
 		    Grid-search &  1000000 &  500 &  250 &  20 &  15 &  20 &  333333 &  300 &  110 \\ \hline
-		    Genético &  736 &  795 &  210 &  72 &  9 &  125 &  358 &  1225 &  726 \\ \hline
+		    Genético &  645 &  647 &  774 &  507 &  8 &  36 &  889 &  933 &  784 \\ \hline
 		\end{tabular}
     \end{center}
     
@@ -504,23 +504,138 @@
 	
 \section{Experimentación y resultados}
 
-A continuación se definió un tablero arbitrario de $N=7$ $M=8$ $C=5$ $P=(N*M)$
-para en una primera instancia para chequear como se defienden nuestros jugadores contra un jugador aleatorio los resultados son los sigueintes:
 
--- Insertar resultados Grid y evolución del genético--
+    \subsection{Experimento 1: Enfrentamientos entre jugadores}
+    
+    Como primera parte de la experimentación, se decidió tomar la idea planteada en el enunciado del Trabajo, que consiste en enfrentar a los jugadores implementados al jugador aleatorio provisto por la cátedra. Para eso, se definió un tablero arbitrario con $N=7$, $M=8$, $C=5$ y $p=(N*M)$, y se jugaron 2000 partidas de cada uno de los siguientes enfrentamientos (1000 empezando un jugador, y 1000 empezando el otro):
+        \begin{enumerate}
+            \item Jugador Goloso versus Jugador Aleatorio.
+            \item Jugador Optimizado con Grid-search versus Jugador Aleatorio.
+            \item Jugador Optimizado con Algoritmo Genético versus Jugador Aleatorio.
+        \end{enumerate}
+    
+    El objetivo de este experimento es, en una primera instancia, evaluar cómo se defienden los jugadores implementados contra un jugador aleatorio. Una pregunta válida que puede disparar este experimento es: \textquestiondown son capaces los jugadores implementados de vencer al jugador aleatorio de manera consistente? A continuación, se muestra primero una tabla con los valores asignados para los parámetros de los tres jugadores propios:
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
+		\hline
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2. &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+            Goloso &  10000 &  400 &  150 &  20 &  15 &  5 &  8000 &  400 &  20 \\ \hline
+		    Grid-search &  1000000 &  500 &  250 &  20 &  15 &  20 &  333333 &  300 &  110 \\ \hline
+		    Genético &  645 &  647 &  774 &  507 &  8 &  36 &  889 &  933 &  784 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    El jugador Aletaorio fue provisto por la cátedra, como se mencionó antes.
+    
+    El jugador \textit{Goloso} fue configurado de acuerdo a la intuición propia acerca de qué escenarios son los más importantes a la hora de evaluar un tablero. Se desarrolló más sobre esto en la sección 2. del informe. Básicamente, se le da mayor relevancia al parámetro 1.1., entendiendo que lo más importante es que el jugador intente alinear la mayor cantidad de fichas en el tablero. A su vez, se le da mucho peso al parámetro 3.1., pues las optimizaciones realizadas con \textit{grid-search} y algoritmo genético dieron a entender que el aspecto defensivo es importante para obtener buenos resultados.
+    
+    El jugador \textit{Grid-search} es el mismo que se mostró al final de la sección 3. del informe. Es decir, sus parámetros fueron valuados entre varios valores posibles, y puntuados de acuerdo a enfrentamientos con otros jugadores implementados. El puntaje que había obtenido de acuerdo al método de evaluación propuesto fue de 7896.
+    
+    Por último, el jugador \textit{Genético} también es igual al descrito al final de la sección 4. del informe, siendo producto de 100 generaciones de simulación del algoritmo genético, y habiendo obtenido un \textit{fitness} de 9419.
+    
+    Una vez descritos los jugadores en uso, se formulará la hipótesis propuesta para el experimento: los tres jugadores implementados ganarán al jugador aleatorio en más del $75\%$ de las partidas. Se elige este número para que se corresponda con lo pedido en el enunciado del Trabajo.
+    
+    El experimento se realizará de la siguiente manera: se usa el juez implementado por la cátedra, donde uno de los jugadores siempre es \texttt{random\_player}, y el otro cambia según el caso entre \texttt{jugador.goloso}, \texttt{jugador.grid-search} y \texttt{jugador.genetico}. Se hará referencia como \textit{Ida} a las 1000 partidas en las que haya empezado jugando el jugador implementado, y \textit{Vuelta} a las 1000 en las que empezara el aleatorio. En las siguientes tablas, se mostrará cuántas partidas perdió, ganó y empató el jugador implementado (goloso, grid-search y genético, respectivamente):
 
--- Mostrar gráficas del fitness y su relativo sentido --
+    \underline{1. Goloso VS Aleatorio}:
+    \begin{center}
+		\begin{tabular}{ | c || c | c | }
+		\hline
+		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
+		    Victoria &  998 &  983 \\ \hline
+		    Empate &  2 &  7 \\ \hline
+		    Derrota &  0 &  10 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    \underline{2. Grid-search VS Aleatorio}:
+    \begin{center}
+		\begin{tabular}{ | c || c | c | }
+		\hline
+		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
+		    Victoria &  994 &  984 \\ \hline
+		    Empate &  3 &  8 \\ \hline
+		    Derrota &  3 &  8 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    \underline{3. Genético VS Aleatorio}:
+    \begin{center}
+		\begin{tabular}{ | c || c | c | }
+		\hline
+		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
+		    Victoria &  1000 &  969 \\ \hline
+		    Empate &  0 &  0 \\ \hline
+		    Derrota &  0 &  31 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    A simple vista, se puede afirmar que los tres jugadores ganan consistentemente al jugador aleatorio de la cátedra, tanto cuando empiezan ellos, como cuando empieza su rival. Pero para tener un panorama más claro, se calculará, para cada enfrentamiento, el porcentaje de victorias de los jugadores sobre el aleatorio (\textit{winrate}):
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c |}
+		\hline
+		Jugador &  Winrate - Ida &  Winrate - Vuelta &  Winrate - Total \\ \hhline{|=#=|=|=|}
+		    Goloso &  $99.8\%$ &  $98.3\%$ &  $99.05\%$ \\ \hline
+		    Grid-search &  $99.4\%$ &  $98.4\%$ &  $98.9\%$  \\ \hline
+		    Genético &  $100\%$ &  $96.9\%$ &  $98.45\%$ \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    \underline{Análisis de los resultados}: para empezar, es claro que los tres jugadores implementados ganaron sus partidas en más del $75\%$ de las veces; por lo tanto, la hipótesis queda confirmada. Además de esto, se puede observar que el hecho de empezar la partida generó una ventaja no despreciable, sobre todo en el caso del algoritmo genético, donde el jugador ganó todas las partidas que empezó, pero fue el peor de los tres cuando empezó su rival. Por otro lado, el jugador goloso obtuvo la mayor proporción de victorias sobre las 2000 partidas, por lo que la intuición en cuanto a asignar valores a los parámetros fue muy efectiva, al menos para vencer a un jugador sin una estrategia fija como es el jugador aleatorio.
+    
+    
+    
+    \subsection{Experimento 2: Desempeño frente a jugadores humanos}
 
-Además de ser sometido a una experimentación cuantitativa, intentamos verificar su calidad contra jugadores humanos, nosotros en particular en un tablero clásico de 4 en linea. La idea es que intentamos encontrar jugadas donde nuestro jugador pierda consistentemente, los resultados son los siguientes:
-
-\begin{itemize}
-            \item \textbf{En general}: Todos los jugadores propuestos, con sus respectivas optimizaciones pierden ante un determinado escenario. Nuestro jugador en general solo anticipa la jugada rival inmediatamente posterior lo que significa que cualquier escenario que anticipe a futuro de más de 2 turnos lo derrota. Citaremos ejemplos diagonales y horizontales a continuación:
-            
-            
-            
-            
-            
-\end{itemize}
+    Además de ser sometidos a una experimentación cuantitativa, se intentará verificar calidad de los jugadores implementados y optimizados, contra jugadores humanos (en particular, los propios miembros del grupo) en un tablero clásico de \textit{4 en línea} (es decir: $N=7$, $M=6$, $C=4$, $p=21$). El objetivo es que encontrar jugadas donde el jugador pierda consistentemente. Se obtuvo lo siguiente:
+    
+    \begin{itemize}
+                \item \textbf{En general}: Todos los jugadores propuestos, con sus respectivas optimizaciones, pierden ante un determinado escenario. Por cómo fueron implementados los jugadores, en general sólo anticipan la jugada rival inmediatamente posterior; lo que significa que cualquier escenario que requiera que sean capaces de anticipar a futuro de más de 2 turnos, lo derrota. A continuación, se muestran escenarios diagonales y horizontales.
+                
+                Por ejemplo, ningún jugador jamás identificará este tipo de jugada:
+                
+                \begin{center}
+                \includegraphics[width=0.4\textwidth]{tablero2turnosfuturo.png}
+                \end{center}
+                
+                En esta situación, la victoria está asegurada para el jugador rojo, y es posible asegurar que ningún jugador implementado, sin importar su optimización, será capaz de anticipar esto. Este tipo de situación inspira quizás replantear si los parámetros que se decidió utilizar son realmente lo suficientemente buenos. Pero en general, también se puede argumentar que es una situación difícil dado que las heurísticas tiene que respetar una cota de complejidad por requerimiento del Trabajo.
+                
+                \item \textbf{Sobre la optimización de parámetros}: Cuando se generaron los parámetros en primera instancia, estos fueron diseñados dando una prioridad alta al bloqueo de casillas donde el rival tenga un ($C-2$) construido. La razón de darle prioridad a esta situación radica en lo que se llamará \textit{"muerte anticipada"}. Considerar el siguiente ejemplo, en el que el jugador azul realiza su jugada en la columna 5:
+                
+                \begin{center}
+                \includegraphics[width=0.4\textwidth]{muerteHorizontal.png}
+                \end{center}
+                
+                En dicha situación, si el azul llega a realizar esa jugada directa, en realidad el jugador rojo puede ganar, debido a que construirá un 3 en línea en el cual trivialmente hay 2 soluciones para ganar.
+                
+                Si miramos el jugador con la estrategia golosa predeterminada (archivo \texttt{goloso.cpp}), esta situación la defiende; sin embargo, al considerar los jugadores optimizados con \textit{grid-search} y algoritmo genético, éstos convergieron a configuraciones de parámetros en las cuales bloquear un $C-2$ no tiene alta prioridad, resultando en que puede surgir este tipo de escenario donde es derrotado. Este podría ser un motivo factible por el cual estos dos jugadores obtuvieron resultados ligeramente peores frente al jugador aleatorio en el Experimento 1 (en comparación al jugador Goloso).
+                
+                Para intentar solventar esto, podríá ser de utilidad reevaluar la función de \textit{fitness}; una buena idea sería armar jugadores triviales que siempre jueguen en este escenario, para que inmediatamente los jugadores que se estén optimizando se vean forzados a jugarlo bien, (o bien  tener un puntaje de \textit{fitness} pésimo, y ser consecuentemente descartados). Sin embargo, el alcance del Trabajo llegó hasta aquí, ya que aún queda más experimentación, y las posteriores conclusiones.
+                
+    \end{itemize}
+    
+    
+    \subsection{Experimento 3: Evolución del \textit{fitness} en el algoritmo genético}
+    
+    Para este tercer experimento, se centrará la atención en el jugador cuyos parámetros son optimizados usando el algoritmo genético explicado en la sección 4. de este informe. Como ya se mencionó, la idea en la que se basa un algoritmo genético es en mejorar iterativamente una población inicial de individuos, a partir de evaluar su aptitud (\textit{fitness}), y realizar cruzas y mutaciones genéticas. Por lo tanto, resulta razonable afirmar que los valores de \textit{fitness} de los individuos (es decir, los valores de los parámetros) sufrirán una evolución con el paso de las generaciones.
+    
+    Esto último da lugar a un experimento, cuyo objetivo es observar de qué manera cambia el \textit{fitness} de los individuos a medida que pasa el tiempo, y transcurren más generaciones. Para eso, se consideró un jugador optimizado con algoritmo genético, con las mismas características usadas en ocasiones anteriores (usando la función de \textit{fitness} \textbf{Puntaje}, la operación de \textit{crossover} \textbf{Moneda}, el mutador \textbf{Normal} y el método de selección \textbf{Mejores}). Luego, en base a una población inicial, se ejecutó el algoritmo durante 100 generaciones, y se calculó el \textit{fitness} promedio de los individuos de cada generación.
+    
+    Dicho proceso dio lugar a resultados que fueron plasmados en el siguiente gráfico:
+    
+    \begin{center}
+    \includegraphics[width=0.7\textwidth]{Evolucion_Genetico.jpg}
+    \end{center}
+    
+    En el eje $x$, se pueden ver las generaciones transcurridas; y en el eje $y$, los valores de \textit{fitness}. La gráfica azul corresponde al \textit{fitness} promedio en cada población, calculada mediante el método \textbf{Puntaje}. \\[3pt]
+    
+    \underline{Análisis de los resultados:} 
+    Es posible ver como durante las primeras 10 o 15 generaciones, el \textit{fitness} crece a un ritmo muy acelerado. Esto tiene sentido, pues teniendo en cuenta que los parámetros iniciales fueron generados aleatoriamente, es razonable que durante las primeras iteraciones del algoritmo haya mucho margen para mejorar los valores asignados. Luego, hay una clara meseta hasta aproximadamente la generación número 35, en la que el algoritmo no pudo encontrar formas de mejorar los genes de los individuos.
+    Sin embargo, se da un repentino crecimiento (quizá debido a una mutación que supuso que la población no se estancase en un máximo local), que deriva en una nueva meseta más larga, que se mantiene durante todas las generaciones subsiguientes que fueron observadas.
+    Es posible que luego de más generaciones el \textit{fitness} volviese a mejorar, sobre todo teniendo en cuenta que las secciones constantes del gráfico van haciéndose cada vez más largas; pero por cuestiones de tiempo, pareció razonable ejecutar el algoritmo por 100 iteraciones.
+    En conclusión, la idea intuitiva de que el \textit{fitness} promedio de los individuos debería aumentar a lo largo del tiempo fue confirmada por el experimento, mostrando que el funcionamiento del algoritmo genético es, tal vez no óptimo, pero sí acertado.
 
 
 
