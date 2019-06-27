@@ -150,40 +150,32 @@ static const vector<struct cruzador> crossovers = {
 
 static void mutacion_uniforme(struct scores& a) {
 	std::bernoulli_distribution moneda(0.01);
-	std::uniform_real_distribution<float> uniforme(0.8, 1.2);
+	std::uniform_real_distribution<float> uniforme(-0.2, 0.2);
 
-	if (moneda(gen))
-		a.posc3 *= uniforme(gen);
-	if (moneda(gen))
-		a.posc2 *= uniforme(gen);
-	if (moneda(gen))
-		a.posc1 *= uniforme(gen);
-	if (moneda(gen))
-		a.c3 *= uniforme(gen);
-	if (moneda(gen))
-		a.c2 *= uniforme(gen);
-	if (moneda(gen))
-		a.c1 *= uniforme(gen);
-	if (moneda(gen))
-		a.bloqueos_c3 *= uniforme(gen);
-	if (moneda(gen))
-		a.bloqueos_c2 *= uniforme(gen);
-	if (moneda(gen))
-		a.bloqueos_c1 *= uniforme(gen);
+	a.posc3 += moneda(gen) * uniforme(gen) * a.posc3;
+	a.posc2 += moneda(gen) * uniforme(gen) * a.posc2;
+	a.posc1 += moneda(gen) * uniforme(gen) * a.posc1;
+	a.c3 += moneda(gen) * uniforme(gen) * a.c3;
+	a.c2 += moneda(gen) * uniforme(gen) * a.c2;
+	a.c1 += moneda(gen) * uniforme(gen) * a.c1;
+	a.bloqueos_c3 += moneda(gen) * uniforme(gen) * a.bloqueos_c3;
+	a.bloqueos_c2 += moneda(gen) * uniforme(gen) * a.bloqueos_c2;
+	a.bloqueos_c1 += moneda(gen) * uniforme(gen) * a.bloqueos_c1;
 }
 
 static void mutacion_normal(struct scores& a) {
-	std::uniform_real_distribution<float> normal(1, 0.01);
+	std::bernoulli_distribution moneda(0.01);
+	std::uniform_real_distribution<float> normal(0, 0.1);
 
-	a.posc3 *= normal(gen);
-	a.posc2 *= normal(gen);
-	a.posc1 *= normal(gen);
-	a.c3 *= normal(gen);
-	a.c2 *= normal(gen);
-	a.c1 *= normal(gen);
-	a.bloqueos_c3 *= normal(gen);
-	a.bloqueos_c2 *= normal(gen);
-	a.bloqueos_c1 *= normal(gen);
+	a.posc3 += moneda(gen) * normal(gen) * a.posc3;
+	a.posc2 += moneda(gen) * normal(gen) * a.posc2;
+	a.posc1 += moneda(gen) * normal(gen) * a.posc1;
+	a.c3 += moneda(gen) * normal(gen) * a.c3;
+	a.c2 += moneda(gen) * normal(gen) * a.c2;
+	a.c1 += moneda(gen) * normal(gen) * a.c1;
+	a.bloqueos_c3 += moneda(gen) * normal(gen) * a.bloqueos_c3;
+	a.bloqueos_c2 += moneda(gen) * normal(gen) * a.bloqueos_c2;
+	a.bloqueos_c1 += moneda(gen) * normal(gen) * a.bloqueos_c1;
 }
 
 struct mutador {
