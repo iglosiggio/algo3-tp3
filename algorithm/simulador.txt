@@ -1,6 +1,0 @@
-rojo azul
-7 6 4 21
-vos
-0
-perdiste
-salir
