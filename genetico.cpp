@@ -345,8 +345,8 @@ int main (int argc, char** argv) {
 		return 1;
 	}
 
-	const int K = 5;
-	const int tamanio_poblacion = 50;
+	const int K = 10;
+	const int tamanio_poblacion = 100;
 	/* Generamos la poblacion inicial */
 	poblacion actual = nueva_poblacion(tamanio_poblacion);
 
