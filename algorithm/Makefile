@@ -1,11 +1,13 @@
 .PHONY: all clean
 
 CXXFLAGS += -Wall
+ESTRATEGIAS = $(wildcard estrategias/*)
+JUGADORES = $(ESTRATEGIAS:estrategias/%.cpp=jugador.%)
 
-all: jugador.goloso jugador.grid-search jugador.genetico
+all: $(JUGADORES)
 
 jugador.%: main.cpp jugador.cpp estrategias/%.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
-	rm -f jugador.goloso jugador.grid-search jugador.genetico
+	rm -f $(JUGADORES)
