@@ -165,7 +165,7 @@ static void mutacion_uniforme(struct scores& a) {
 
 static void mutacion_normal(struct scores& a) {
 	std::bernoulli_distribution moneda(0.01);
-	std::uniform_real_distribution<float> normal(0, 0.1);
+	std::normal_distribution<float> normal(0, 0.1);
 
 	a.posc3 += moneda(gen) * normal(gen) * a.posc3;
 	a.posc2 += moneda(gen) * normal(gen) * a.posc2;
@@ -373,9 +373,6 @@ int main (int argc, char** argv) {
 		for (struct ejemplar& e : actual)
 			e.fitness = 0;
 
-		/* Duplico los padres (en la nueva generación los muto). */
-		actual.insert(actual.end(), actual.begin(), actual.end());
-
 		/* 3. Genero la nueva generación cruzando ejemplares */
 		for (int i = 0; i < K; i++)
 		for (int j = i + 1; j < K; j++) {
@@ -389,21 +386,11 @@ int main (int argc, char** argv) {
 				actual[i].params, actual[j].params
 			);
 			actual.push_back({params, 0});
-
-			params = cruzador.cruzar(
-				actual[i].params, actual[j].params
-			);
-			actual.push_back({params, 0});
-
-			params = cruzador.cruzar(
-				actual[i].params, actual[j].params
-			);
-			actual.push_back({params, 0});
 		}
 
 		/* 4. Muto los ejemplares */
-		for (long unsigned i = K; i < actual.size(); i++)
-			mutador.mutar(actual[i].params);
+		for (struct ejemplar& e : actual)
+			mutador.mutar(e.params);
 	}
 
 	return 0;
