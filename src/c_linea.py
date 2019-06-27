@@ -8,7 +8,7 @@ import argparse
 from Referee import Referee
 from PlayerCommunicator import PlayerCommunicator
 from HumanPlayer import HumanPlayer
-from constants import BLUE, RED
+from constants import BLUE, RED, TIE
 
 
 def main(args):
@@ -39,15 +39,23 @@ def main(args):
                   red_player, show_ui=args.ui)
 
     iteration = 0
+    resultados = {
+        RED: 0,
+        BLUE: 0,
+        TIE: 0
+    }
     while args.iterations is None or args.iterations > iteration:
         iteration += 1
         if args.first == BLUE:
-            ref.runPlay(blue_player)
+            ganador = ref.runPlay(blue_player)
         elif args.first == RED:
-            ref.runPlay(red_player)
+            ganador = ref.runPlay(red_player)
         else:
-            ref.runPlay(choice([blue_player, red_player]))
+            ganador = ref.runPlay(choice([blue_player, red_player]))
 
+        resultados[ganador] += 1
+
+    print(resultados)
     ref.exit()
 
 
