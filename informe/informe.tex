@@ -211,7 +211,7 @@
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
 		\hline
-		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2 &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2. &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
 		    Agresiva &  1000000 &  500 &  200 &  20 &  15 &  5 &  333333 &  300 &  20 \\ \hline
 		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
 		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
@@ -266,7 +266,7 @@
         Entonces, $O($\texttt{puntuarJugada}$) \in O(M)$
     \end{center}
     
-    Ahora bien, como se habíá explicado previamente, \texttt{puntuarEnemigo} es una función que realiza $O(N)$ iteraciones, ya que calcula el puntaje de cada uno de los estados resultantes del tablero; esto es, una vez por cada columna. Luego:
+    Ahora bien, como se había explicado previamente, \texttt{puntuarEnemigo} es una función que realiza $O(N)$ iteraciones, ya que calcula el puntaje de cada uno de los estados resultantes del tablero; esto es, una vez por cada columna. Luego:
     
     \begin{center}
         $O($\texttt{puntuarEnemigo}$) = O(N) \times O($\texttt{puntuar}$)$
@@ -309,9 +309,28 @@
         \end{itemize}
     donde $V_{i}$ es el conjunto de los valores considerados para el parámetro $i$.
     
-    Luego, una vez determinados los valores que puede tomar cada parámetro, se utilizará \textit{grid-search} para elegir qué combinación de ellos es la que produce mejores jugadas. Para eso, se probarán todas las posibilidades de pesos para cada parámetro (dentro de los conjuntos $V_{i}$ definidos arriba), y se obtendrá el puntaje obtenido para la configuración actual de parámetros. Este puntaje se calcula utilizando al \textit{Juez} (función \texttt{juez} definida en el archivo \texttt{juez.cpp}), que: dados los valores de $N$, $M$, $C$ y $p$, además de dos jugadores con sus correspondientes configuraciones de parámetros, hace que se juegue una partida con dichos datos, y retorna un valor distinto por cada resultado posible (victoria de jugador azul, victoria del rojo, o empate).
+    Luego, una vez determinados los valores que puede tomar cada parámetro, se utilizará \textit{grid-search} para elegir qué combinación de ellos es la que produce mejores jugadas. Para eso, se probarán todas las combinaciones de pesos para cada parámetro (dentro de los conjuntos $V_{i}$ definidos arriba), y se generará un puntaje para la configuración testeada. El puntaje se calculara en base a victorias, derrotas y empates dada una cantidad determinada de turnos para lograrlo.
     
-    Por cada combinación posible de valores para los parámetros, se simulan varias partidas, con diferentes tamaños de tablero. Así, por cada tablero, el jugador que utiliza la combinación de parámetros en cuestión, se enfrenta dos veces a cada uno de los jugadores que usan las tres configuraciones golosas definidas anteriormente (recordar que estas eran \textit{agresiva}, \textit{bloqueadora} y \textit{al medio}): una vez empieza él, y la otra vez empieza el rival. Esto se hizo de esta manera ya que el jugador que empieza la partida puede tener ventaja sobre su oponente. Por este motivo, se puntúa de forma diferente un resultado dependiendo de si el jugador empezó o no, siguiendo el siguiente esquema:
+    Por cada combinación posible de valores para los parámetros, se simulan varias partidas, con diferentes tamaños de tablero. Los tableros que se generan corresponden a 2 funciones de $C$, el cual varía entre $\{3..10\}$. Las dimensiones del tablero y cantidad de fichas se escriben de la siguiente forma:
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c | c | }
+		\hline
+		tipo de tablero &  c &  columnas & filas & p \\ \hhline{|=#=|=|=|=|}
+		    Cuadrado & $\{3..10\}$ &  $(2 * C)$ & $(2 * C) - 1$ & $ (n * m)$ \\ \hline
+		    Rectángulo Horizontal & $\{3..10\}$ &  $(3 * C)$ &  $(3/2 * C)$ & $ (n * m)$ \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    En cada caso, si la cantidad de filas resulta no entera, se redondea para arriba.
+    
+    Los tableros tienen dicha forma por las siguientes razones. Los tableros donde $(C=3)$ conforman un limite inferior, pues está demostrado que siempre gana el primer jugador si este juega por el medio; el segundo jugador lo único que puede hacer es retrasar la victoria del rival, bloqueándolo. Por otor lado, un $C$ más pequeño no tiene sentido porque el juego se vuelve trivial.
+    
+    Asimismo, se define $C=10$ como cota superior, debido a la dificultad que habría en estos tableros de construir un 10 en línea sin ser bloqueado por el rival, lo cual desencadenaría en un empate.
+    
+    Respecto a las dimensiones del tablero, se plantearon 2 formas. Una cuadrada en función de $C$, lo que significa que dominar el medio tiene prioridad, ya que casi todos los juegos horizontales y diagonales requieren pasar por fichas en el medio. En el rectangular horizontal, el medio pierde prioridad por ser más amplio el tablero; sin embargo, la cantidad de victorias verticales decae en comparación con las diagonales y horizontales. Finalmente, se consideró $P= (n * m)$ debido a que interesa comprobar cómo juega exhaustivamente y que los empates solo sucedan si realmente eligieron una forma de jugar donde es imposible que alguno gane.
+    
+    Ahora, se pasará a describir los enfrentamientos entre los jugadores. El jugador $V_{i}$ que utiliza la combinación de parámetros, se enfrenta dos veces a cada uno de los jugadores que usan las tres configuraciones golosas definidas anteriormente (recordar que estas eran \textit{agresiva}, \textit{bloqueadora} y \textit{al medio}): una vez empieza él, y la otra vez empieza el rival. Esto se repite por cada uno de los tableros generados. Esto se hizo de esta manera ya que el jugador que empieza la partida puede tener ventaja sobre su oponente. Por este motivo, se puntúa de forma diferente un resultado dependiendo de si el jugador empezó o no, siguiendo el siguiente esquema:
     
     \begin{center}
 		\begin{tabular}{ | c || c | c | }
@@ -323,7 +342,9 @@
 		\end{tabular}
     \end{center}
     
-    En esta tabla, se puede ver el puntaje que se asigna a una configuración de parámetros según si el jugador que la utilizó empezó jugando la partida, o fue su rival el primero. El valor $t$ es igual a la cantidad de turnos que duró la partida, dividido dos. Se incluyó esto en las puntuaciones para darle valor a que el jugador gane la partida lo antes posible (a menos turnos, mayor puntaje por victoria), o que dé la mayor cantidad de \textit{pelea} antes de ser vencido (a más turnos, mayor puntaje por derrota). También se puede observar que, como se dijo antes, es más valioso ganar si empezó jugando el rival, y además es menos grave perder o empatar en esos casos.
+    En esta tabla, se puede ver el puntaje que se asigna a una configuración de parámetros según si el jugador que la utilizó empezó jugando la partida, o fue su rival el primero. El valor $t$ es igual a la cantidad de turnos que duró la partida dividido dos. Se incluyó esto en las puntuaciones para darle valor a que el jugador gane la partida lo antes posible (a menos turnos, mayor puntaje por victoria), o que dé la mayor cantidad de \textit{pelea} antes de ser vencido (a más turnos, mayor puntaje por derrota). También se puede observar que, como se dijo antes, es más valioso ganar si empezó jugando el rival, y además es menos grave perder o empatar en esos casos.
+    
+    Por la forma en la que se calcula este puntaje, da prioridad a los tableros más pequeños debido a que la cantidad de turnos que pueden haber antes del empate en estos es menor. Esto es intencional, debido a que como es dicho anteriormente, nuestra hipótesis es que en tableros con C muy grande, es más fácil forzar un empate.
     
     De todo esto se encarga la función \texttt{puntuar} (definida en \texttt{puntuar\_params.h}), que calcula el puntaje del jugador en evaluación después de disputar las seis partidas por cada tablero diferente (dos contra cada rival). Expresado más formalmente, el puntaje se calcula de la siguiente manera:
     
@@ -369,7 +390,7 @@
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
 		\hline
-		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2 &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2. &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
 		    Agresiva &  1000000 &  500 &  200 &  20 &  15 &  5 &  333333 &  300 &  20 \\ \hline
 		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
 		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
@@ -391,16 +412,115 @@
 
 \section{Optimización de los parámetros 2: algoritmo genético}
 
+    \subsection{Descripción del algoritmo}
+    
+    En esta segunda etapa de optimización de los parámetros propuestos, se hará uso de una técnica diferente a la expuesta en el apartado anterior: esta es la de \textit{algoritmos genéticos}. Esta técnica es una metaheurística basada en refinar iterativamente una cierta población inicial, para intentar \textit{converger} a un conjunto de características considerado \textit{bueno}. Es decir, se debe contar con una población inicial, en donde los individuos tengan ciertas características (en este caso, son jugadores con valores diferentes para sus parámetros), y a partir de ciertos mecanismos, que se explicarán más adelante, tratar de tender a una combinación de estos parámetros que lleve a los mejores resultados.
+    
+    Esquemáticamente, es posible dividir un algoritmo genético en los siguientes pasos:
+        \begin{enumerate}
+            \item Construir una población inicial.
+            \item Evaluar la aptitud (\textit{fitness}) de cada individuo de la población.
+            \item Seleccionar miembros de la población, de acuerdo a algún criterio o método de selección establecido.
+            \item Construir una nueva población cruzando (\textit{crossover}) los miembros seleccionados.
+            \item \textit{Mutar} algunos de los miembros, para evitar estancarse en un valor muy rápidamente (no converger antes de tiempo).
+            \item Repetir los pasos del 2. al 5. una cantidad $g$ de \textit{generaciones}, o hasta que se cumpla cierta condición de corte (por ejemplo, poca variabilidad entre los individuos).
+        \end{enumerate}
+        
+    En el caso particular de este Trabajo, la población inicial consiste de 100 individuos (paso 1), que son jugadores que utilizan como \textit{estrategia} de juego una combinación de los nueve parámetros, donde cada valor asignado a un parámetro se elige uniformemente entre 0 y 1000. Este método de generación de valores para los parámetros fue elegido para poder producir pesos de manera puramente aleatoria, pero con una cierta distribución. 
+    
+    Luego, se utiliza alguna de las dos funciones de \textit{fitness} definidas para evaluar la aptitud de cada individuo de la población (paso 2). Posteriormente se ordenan los individuos según su aptitud, y se \textit{normalizan} los resultados de \textit{fitness} (esto no es parte del esquema mencionado para un algoritmo genético, pero se decidió hacerlo pues la evaluación de \textit{fitness} implementada es una forma de puntuar a los individuos; entonces, resultó lógico establecer que el valor de \textit{fitness} represente qué parte del puntaje total obtuvo cada individuo).
+    
+    Una vez calculada la aptitud de cada miembro de la población, se seleccionan 10 individuos (paso 3) para realizar cruzas. Cada par de estos individuos tendrá dos hijos (paso 4), generando 90 nuevos individuos en total. Y además de esto, se agregarán copias de los 10 individuos seleccionados en el paso 3, para mantener una parte de la población original en la población resultante. El último paso es realizar mutaciones a todos los individuos, donde un generador de números aleatorios decidirá si un individuo dado mutará o no (paso 5).
+    
+    
+    \subsection{Implementación de sus componentes}
+
+    Ahora, habiendo descrito a grandes rasgos el comportamiento del algoritmo genético, se pasará a definir las distintas partes que lo componen en la implementación realizada. Todas estas partes son las que recibirá como parámetro el algoritmo; además, ejecutar el binario que acompaña este informe muestra las diferentes opciones configurables. Estas se corresponden con distintas alternativas implementadas para cada parte del algoritmo, a saber: \\[4pt]
+    
+    \underline{Cantidad de generaciones}: esto establece cuántas generaciones de individuos se realizarán hasta finalizar la simulación del algoritmo genético. Esto responde únicamente al objetivo de que el algoritmo termine, y puede ser definido al momento de ejecutarlo. Corresponde al valor $g$ mencionado en el paso 6 del esquema.
+    
+    \underline{Funciones de \textit{fitness}}: estos son los métodos con los que se evalúa la aptitud de los individuos de una cierta población. Es difícil definir estas funciones como la función objetivo a optimizar, pues esta es complicada de definir, ya que medir qué tan bueno es un jugador de \textit{C en línea} no es sencillo. Por lo tanto, se plantearon dos funciones de \textit{fitness} diferentes:
+        \begin{itemize}
+            \item \textbf{Puntaje}: esto es asignarle a un jugador una puntuación numérica en función de su configuración de parámetros. Este puntaje se calcula de la misma manera que se explicó en el apartado de \textit{grid-search} de este informe; es decir, utilizando la función \texttt{puntuar}. Así, el método de evaluación consiste en tomar a cada miembro de la población, calcular su puntaje utilizando \texttt{puntuar}, y restarle un valor equivalente a la puntuación de perder todas las partidas jugadas en el turno cero.
+            \item \textbf{Torneo}: este método consiste en enfrentar a todos los individuos entre sí. Esto es, cada jugador (con su configuración de parámetros) juega dos partidas de \textit{C en línea} (una empezando él, y otra empezando su rival) contra cada uno de los demás jugadores. Así, se calculan puntajes para cada jugador, de acuerdo al resultado (victoria, empate o derrota), y según quién haya empezado la partida. Luego, el \textit{fitness} de cada jugador se va formando a partir de sumarle los puntos que haya obtenido en cada partida (3 por victoria, 1 por empate, 0 por derrota, siguiendo el modelo futbolístico).
+        \end{itemize}
+    Algo interesante a destacar es que la función de \textit{fitness} \textbf{Torneo} es relativa a la población; esto significa que un individuo que tiene muy buenos resultados en el contexto de una población determinada puede ser considerablemente peor en una población diferente. En cambio, la función \textbf{Puntaje} produce resultados de carácter absoluto; es decir, una configuración de valores para los parámetros determinada, siempre producirá la misma puntuación al calcular su \textit{fitness}.
+    
+    A su vez, por como fueron planteadas estas funciones de \textit{fitness}, es posible intuir qué tipo de resultados se esperaría obtener en una eventual experimentación con el algoritmo genético. En el caso de la primera función, resultaría esperable que una cantidad reducida de estrategias predomine sobre otras, y que el \textit{fitness} promedio de los individuos vaya aumentando cuantas más generaciones transcurren. Respecto al \textbf{Torneo}, no sería sorprendente que el \textit{fitness} promedio de los individuos disminuyese con el tiempo, pues si se van consiguiendo mejores jugadores con cada generación, estos van a acabar empatando en sus enfrentamientos con frecuencia, reduciendo el valor de \textit{fitness} que se les asigna. Además, es esperable que la desviación estándar del \textit{fitness} se reduzca a medida que pasa el tiempo y las generaciones.
+    
+    Al igual que ocurrió con la cantidad $g$ de generaciones, la función de \textit{fitness} a utilizar puede ser elegida antes de comenzar la simulación: se pasa por parámetro un \textit{string} que hace referencia al nombre de la función, y el programa se encarga de seleccionar la función que corresponda. Esto es así para todas las partes del algoritmo. \\[4pt]
+    
+    \underline{Operaciones de \textit{crossover}}: estas son los métodos con los que se realizan las cruzas entre los individuos seleccionados de una población. Estos se implementan sobre lo que se conoce como el \textit{genoma}, que es un conjunto de genes; en este caso, esos genes son los valores asignados a cada uno de los parámetros. Es decir, son los atributos que definen a un individuo dentro de una población. Lo que controla la función de \textit{crossover} es de qué manera \textit{hereda} el producto de una cruza (la \textit{cría}) los genes de sus padres. Para esto, se implementaron dos métodos diferentes:
+        \begin{itemize}
+            \item \textbf{Moneda}: esta función consiste en que cada parámetro de una cría tiene igual probabilidad de provenir de un progenitor o del otro (se tira una \textit{moneda}, con igual probabilidad de obtener \textit{cara} o \textit{ceca}). Esto fue implementado utilizando una variable aleatoria con distribución Bernoulli, con probabilidad 0.5. Entonces, por cada parámetro de la configuración del producto de la cruza, se decide de cuál de sus padres heredará el valor, dependiendo de si la variable toma valor 0 o 1.
+            \item \textbf{Promedio}: en este caso, en vez de recurrir a métodos aleatorios para definir los valores para los parámetros de la cría, simplemente se calcula, para cada parámetro, el promedio entre el valor de dicho parámetro correspondiente a los dos padres.
+        \end{itemize}
+        
+    \underline{Operaciones de \textit{mutación}}: la mutación es un proceso aleatorio que altera, con cierta probabilidad, cada gen en el genoma de un individuo de la población. Este proceso tiene como objetivo dar saltos dentro del espacio de soluciones, lo cual sirve para evitar que las poblaciones queden estancadas  en un máximo local, y puedan seguir \textit{evolucionando} hacia una convergencia mejor en sentido global. En este caso, nuevamente los genes son los valores asignados a cada parámetro de un jugador; estos variarán con una probabilidad de 0.01 (definida otra vez como variable aleatoria con distribución Bernoulli). Además, la manera en la que variarán (en caso de que dicha variable resulte 1) también será aleatoria, de acuerdo a dos distribuciones diferentes, que generan dos alternativas en cuanto a funciones de mutación:
+        \begin{itemize}
+            \item \textbf{Uniforme}: cada parámetro tiene un $1\%$ de probabilidad (debido a la variable Bernoulli con probabilidad 0.01) de que su valor sea aumentado o disminuido entre un $-20\%$ y un $20\%$, decidido con distribución uniforme.
+            \item \textbf{Normal}: cada parámetro tiene un $1\%$ de probabilidad de que su valor sea aumentado o reducido, de acuerdo a una distribución normal, con desvío estándar de $10\%$.
+        \end{itemize}
+        
+    \underline{Métodos de selección}: estos métodos son los que se utilizan para determinar qué individuos de una generación se reproducirán, ejerciendo influencia sobre la generación siguiente, y cuáles \textit{morirán} (genéticamente hablando) en la generación actual. Hay diferentes formas de encarar un método de selección, siendo la principal decisión a tomar la de considerar o no la aptitud (\textit{fitness}) de los individuos. Es esta decisión la que llevó a plantear las siguientes formas de seleccionar ejemplares de una población:
+        \begin{itemize}
+            \item \textbf{Mejores}: consiste en una selección en forma de competencia, en la que se selecciona los 10 individuos que hayan obtenido valores de \textit{fitness} más altos. Es claro que este método tiene en cuenta la aptitud de los individuos para decidir cuáles trascenderán a lo largo de las generaciones, por lo que sería de esperar que se produzca una convergencia hacia parámetros \textit{buenos} (al menos dentro de lo contemplado por las funciones de \textit{fitness} definidas) con el paso de las generaciones.
+            \item \textbf{Sorteo}: en este método, todos los individuos tienen posibilidades de ser seleccionados para reproducirse. La forma en la que se diseñó consiste en recorrer varias veces la población, ordenada por el valor de \textit{fitness} obtenido; así, por cada individuo (jugador) $\pi$ se realizan ensayos con probabilidad $\mathcal{P}=fitness(\pi) / fitness \ total$, y se selecciona el ejemplar en caso de que supere el ensayo. Además, no se agrega un individuo dado más de una vez, y se asume que ningún individuo se llevará todos los puntos. El algoritmo finaliza una vez se hayan elegido 10 individuos. Este método de selección también tiene en cuenta la evaluación de los individuos, pero da posibilidad a todos ellos de reproducirse; por lo tanto, se puede decir que se trata de una selección ponderada.
+        \end{itemize}
+        
+    Habiendo explicado cómo se planteó cada uno de los componentes que hacen al algoritmo genético, y habiendo también mostrado un esquema de cómo funciona un algoritmo genético típico, debería resultar claro cómo se aplica cada una de las partes explicadas a los distintos pasos enumerados al principio de esta sección.
+    
+    
+    \subsection{Resultados obtenidos}
+    
+    Después de ejecutar el algoritmo genético y que transcurran 26 generaciones, los valores de los parámetros convergieron a la siguiente configuración, que obtuvo un \textit{fitness} de 9418. Al igual que se hizo con los resultados de \textit{grid-search}, se incluyen tambien las combinaciones de parámetros vistas anteriormente, para comparar de manera sencilla.
+    
+    \begin{center}
+		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
+		\hline
+		Nombre &  1.1. &  1.2. &  1.3. &  2.1. &  2.2. &  2.3. &  3.1. &  3.2. &  3.3 \\ \hhline{|=#=|=|=|=|=|=|=|=|=|}
+		    Agresiva &  1000000 &  500 &  200 &  20 &  15 &  5 &  333333 &  300 &  20 \\ \hline
+		    Bloqueadora &  1000000 &  400 &  150 &  20 &  15 &  5 &  333333 &  500 &  200 \\ \hline
+		    Al medio &  1000000 &  500 &  150 &  40 &  25 &  10 &  333333 &  600 &  20 \\ \hline
+		    Grid-search &  1000000 &  500 &  250 &  20 &  15 &  20 &  333333 &  300 &  110 \\ \hline
+		    Genético &  736 &  795 &  210 &  72 &  9 &  125 &  358 &  1225 &  726 \\ \hline
+		\end{tabular}
+    \end{center}
+    
+    A partir de estos resultados, se podría afirmar que:
+        \begin{itemize}
+            \item Ambas técnicas de optimización arrojaron que los parámetros del tipo 2 (2.1., 2.2., 2.3.) son los que menos peso relativo tienen en una configuración óptima. Esto se corresponde con lo que se supuso al momento de explicar los parámetros elegidos.
+            \item El valor del parámetro 1.1. no escaló cerca del peso que se le había asignado de forma golosa. Esto puede hacer considerar que el escenario de que haya $C-1$ fichas alineadas no es significativamente más importante que otros. Sin embargo, está entre los parámetros con valor relativo más alto, lo cual tiene sentido, pues se asigna mayor puntaje a los jugadores que ganan más partidas.
+            \item El peso calculado para el parámetro 3.2. es mucho mayor que el que se le asignó en otras configuraciones. De aquí se puede concluir que la defensa también tiene mucha importancia a la hora de ganar las partidas de \textit{C en línea}.
+        \end{itemize}
+    
 
 
-	
-	
+
 \newpage
 
 %----------------------------------------------------------------------------------------------------------
 		
 	
 \section{Experimentación y resultados}
+
+A continuación se definió un tablero arbitrario de $N=7$ $M=8$ $C=5$ $P=(N*M)$
+para en una primera instancia para chequear como se defienden nuestros jugadores contra un jugador aleatorio los resultados son los sigueintes:
+
+-- Insertar resultados Grid y evolución del genético--
+
+-- Mostrar gráficas del fitness y su relativo sentido --
+
+Además de ser sometido a una experimentación cuantitativa, intentamos verificar su calidad contra jugadores humanos, nosotros en particular en un tablero clásico de 4 en linea. La idea es que intentamos encontrar jugadas donde nuestro jugador pierda consistentemente, los resultados son los siguientes:
+
+\begin{itemize}
+            \item \textbf{En general}: Todos los jugadores propuestos, con sus respectivas optimizaciones pierden ante un determinado escenario. Nuestro jugador en general solo anticipa la jugada rival inmediatamente posterior lo que significa que cualquier escenario que anticipe a futuro de más de 2 turnos lo derrota. Citaremos ejemplos diagonales y horizontales a continuación:
+            
+            
+            
+            
+            
+\end{itemize}
 
 
 
