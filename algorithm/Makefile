@@ -1,8 +1,11 @@
 .PHONY: all clean
 
-all: jugador
+CXXFLAGS += -Wall
 
-jugador: main.cpp jugador.o
+all: jugador.goloso jugador.grid-search jugador.genetico
+
+jugador.%: main.cpp jugador.cpp estrategias/%.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 clean:
-	rm -f jugador.o jugador
+	rm -f jugador.goloso jugador.grid-search jugador.genetico

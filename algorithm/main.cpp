@@ -30,17 +30,8 @@ std::string read_str() {
     return msg;
 }
 
-struct scores greedy_conf {
-	.posc3 = 5,
-	.posc2 = 15,
-	.posc1 = 20,
-	.c3 = 150,
-	.c2 = 400,
-	.c1 = 10000,
-	.bloqueos_c3 = 20,
-	.bloqueos_c2 = 400,
-	.bloqueos_c1 = 8000
-};
+/* Las estrategias están en la carpeta correspondiente */
+extern struct scores params;
 
 int main() {
 
@@ -64,7 +55,7 @@ int main() {
 
         msg = read_str();
         if (msg == "vos") {
-            int col = evaluarTableros(tablero, fichas, c, p, 1, &greedy_conf);
+            int col = evaluarTableros(tablero, fichas, c, p, 1, &params);
             tablero[0][col] = 1;
             fichas[col]++;
             send(col);
@@ -80,7 +71,7 @@ int main() {
             fichas[colOponent]++;
             
             
-            int col = evaluarTableros(tablero, fichas, c, p, 1, &greedy_conf);
+            int col = evaluarTableros(tablero, fichas, c, p, 1, &params);
             tablero[fichas[col]][col] = 1;
             fichas[col]++;
             send(col);
