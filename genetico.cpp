@@ -301,11 +301,24 @@ static inline void imprimir_fitness(const poblacion& poblacion, int gen) {
 }
 
 template <class T>
-static inline T buscar(const char* nombre, vector<T> opciones) {
-	for (auto opcion : opciones)
+static inline T buscar(const char* nombre, const vector<T>& opciones) {
+	for (const auto& opcion : opciones)
 		if (opcion.nombre == nombre)
 			return opcion;
 	throw "No encontrado";
+}
+
+template <class T>
+static inline void opciones_param(const char* nombre, const vector<T>& opciones) {
+	using std::cout;
+	using std::endl;
+
+	cout << "\t " << nombre << "\t = " << opciones[0].nombre;
+
+	for (unsigned long i = 1; i < opciones.size(); i++)
+		cout << " | " << opciones[i].nombre;
+
+	cout << endl;
 }
 
 int main (int argc, char** argv) {
@@ -333,10 +346,10 @@ int main (int argc, char** argv) {
 		cout << "Uso: " << argv[0]
 		     << " <generaciones> <fit> <cross> <mut> <sel>" << endl;
 		cout << "\t generaciones = número" << endl;
-		cout << "\t fit   = torneo  | puntaje" << endl;
-		cout << "\t cross = moneda  | promedio" << endl;
-		cout << "\t mut   = normal  | uniforme" << endl;
-		cout << "\t sel   = mejores | sortear" << endl;
+		opciones_param("fit", evaluaciones);
+		opciones_param("cross", crossovers);
+		opciones_param("mut", mutaciones);
+		opciones_param("sel", selectores);
 		return 1;
 	}
 
