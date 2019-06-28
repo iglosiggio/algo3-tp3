@@ -206,7 +206,7 @@
             \end{itemize}
     \end{itemize}
     
-    Los pesos asignados a cada uno de estos parámetros forman una configuración posible de la función paramétrica; en particular, se trata de una configuración de carácter goloso. Asimismo, es posible planificar estrategias de juego golosas para el jugador implementado, según que peso relativo se le dé a cada parámetro considerado. Estas son las configuraciones golosas que se diseñaron en base a asignar pesos diferentes a los parámetros, dando como resultado distintos jugadores que utilizan estos valores para elegir, en cada paso, la jugada a realizar:
+    Los pesos asignados a cada uno de estos parámetros forman una configuración posible de la función parametrizable; en particular, se trata de una configuración de carácter goloso. Asimismo, es posible planificar estrategias de juego golosas para el jugador implementado, según que peso relativo se le dé a cada parámetro considerado. Estas son las configuraciones golosas que se diseñaron en base a asignar pesos diferentes a los parámetros, dando como resultado distintos jugadores que utilizan estos valores para elegir, en cada paso, la jugada a realizar:
     
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
@@ -324,7 +324,7 @@
     
     En cada caso, si la cantidad de filas resulta no entera, se redondea para arriba.
     
-    Los tableros tienen dicha forma por las siguientes razones. Los tableros donde $(C=3)$ conforman un limite inferior, pues está demostrado que siempre gana el primer jugador si este juega por el medio; el segundo jugador lo único que puede hacer es retrasar la victoria del rival, bloqueándolo. Por otor lado, un $C$ más pequeño no tiene sentido porque el juego se vuelve trivial.
+    Los tableros tienen dicha forma por las siguientes razones. Los tableros donde $(C=3)$ conforman un limite inferior, pues está demostrado que siempre gana el primer jugador si este juega por el medio; el segundo jugador lo único que puede hacer es retrasar la victoria del rival, bloqueándolo. Por otro lado, un $C$ más pequeño no tiene sentido porque el juego se vuelve trivial.
     
     Asimismo, se define $C=10$ como cota superior, debido a la dificultad que habría en estos tableros de construir un 10 en línea sin ser bloqueado por el rival, lo cual desencadenaría en un empate.
     
@@ -473,7 +473,7 @@
     
     \subsection{Resultados obtenidos}
     
-    Después de ejecutar el algoritmo genético (usando la función de \textit{fitness} \textbf{Puntaje}, la operación de \textit{crossover} \textbf{Moneda}, el mutador \textbf{Normal} y el método de selección \textbf{Mejores})  y que transcurran 100 generaciones, los valores de los parámetros convergieron a la siguiente configuración, que obtuvo un \textit{fitness} de 9419. Al igual que se hizo con los resultados de \textit{grid-search}, se incluyen tambien las combinaciones de parámetros vistas anteriormente, para comparar de manera sencilla.
+    Después de ejecutar el algoritmo genético (usando la función de \textit{fitness} \textbf{Puntaje}, la operación de \textit{crossover} \textbf{Moneda}, el mutador \textbf{Normal} y el método de selección \textbf{Mejores})  y que transcurran 100 generaciones, los valores de los parámetros convergieron a la siguiente configuración, que obtuvo un \textit{fitness} de 9419. Al igual que se hizo con los resultados de \textit{grid-search}, se incluyen también las combinaciones de parámetros vistas anteriormente, para comparar de manera sencilla.
     
     \begin{center}
 		\begin{tabular}{ | c || c | c | c | c | c | c | c | c | c | }
@@ -509,9 +509,9 @@
     
     Como primera parte de la experimentación, se decidió tomar la idea planteada en el enunciado del Trabajo, que consiste en enfrentar a los jugadores implementados al jugador aleatorio provisto por la cátedra. Para eso, se definió un tablero de \textit{4 en línea} con $N=7$, $M=6$, $C=4$ y $p=21$, y se jugaron 2000 partidas de cada uno de los siguientes enfrentamientos (1000 empezando un jugador, y 1000 empezando el otro):
         \begin{enumerate}
-            \item Jugador Goloso versus Jugador Aleatorio.
-            \item Jugador Optimizado con Grid-search versus Jugador Aleatorio.
-            \item Jugador Optimizado con Algoritmo Genético versus Jugador Aleatorio.
+            \item Jugador Goloso contra Jugador Aleatorio.
+            \item Jugador Optimizado con Grid-search contra Jugador Aleatorio.
+            \item Jugador Optimizado con Algoritmo Genético contra Jugador Aleatorio.
         \end{enumerate}
     
     El objetivo de este experimento es, en una primera instancia, evaluar cómo se defienden los jugadores implementados contra un jugador aleatorio. Una pregunta válida que puede disparar este experimento es: \textquestiondown son capaces los jugadores implementados de vencer al jugador aleatorio de manera consistente? A continuación, se muestra primero una tabla con los valores asignados para los parámetros de los tres jugadores propios:
@@ -526,7 +526,7 @@
 		\end{tabular}
     \end{center}
     
-    El jugador Aletaorio fue provisto por la cátedra, como se mencionó antes.
+    El jugador Aleatorio fue provisto por la cátedra, como se mencionó antes.
     
     El jugador \textit{Goloso} fue configurado de acuerdo a la intuición propia acerca de qué escenarios son los más importantes a la hora de evaluar un tablero. Se desarrolló más sobre esto en la sección 2. del informe. Básicamente, se le da mayor relevancia al parámetro 1.1., entendiendo que lo más importante es que el jugador intente alinear la mayor cantidad de fichas en el tablero. A su vez, se le da mucho peso al parámetro 3.1., pues las optimizaciones realizadas con \textit{grid-search} y algoritmo genético dieron a entender que el aspecto defensivo es importante para obtener buenos resultados.
     
@@ -612,7 +612,7 @@
                 
                 Si miramos el jugador con la estrategia golosa predeterminada (archivo \texttt{goloso.cpp}), esta situación la defiende; sin embargo, al considerar el jugador optimizado con algoritmo genético, éste convergió a una configuración de parámetros en la cual bloquear un $C-2$ no tiene alta prioridad, resultando en que puede surgir este tipo de escenario donde es derrotado. Este podría ser un motivo factible por el cual este jugador obtuvo resultados ligeramente peores frente al jugador aleatorio en el Experimento 1 (en comparación al jugador Goloso).
                 
-                Para intentar solventar esto, podríá ser de utilidad reevaluar la función de \textit{fitness}; una buena idea sería armar jugadores triviales que siempre jueguen en este escenario, para que inmediatamente los jugadores que se estén optimizando se vean forzados a jugarlo bien, (o bien  tener un puntaje de \textit{fitness} pésimo, y ser consecuentemente descartados). Sin embargo, el alcance del Trabajo llegó hasta aquí, ya que aún queda más experimentación, y las posteriores conclusiones.
+                Para intentar solventar esto, podría ser de utilidad reevaluar la función de \textit{fitness}; una buena idea sería armar jugadores triviales que siempre jueguen en este escenario, para que inmediatamente los jugadores que se estén optimizando se vean forzados a jugarlo bien, (o bien  tener un puntaje de \textit{fitness} pésimo, y ser consecuentemente descartados). Sin embargo, el alcance del Trabajo llegó hasta aquí, ya que aún queda más experimentación, y las posteriores conclusiones.
                 
     \end{itemize}
     
@@ -651,7 +651,7 @@ Durante el desarrollo de este trabajo práctico, se consiguió realizar un acerc
 
 Por ejemplo, es claro, después de analizar el desempeño de los jugadores implementados, que es de gran relevancia pensar detenidamente tanto qué parámetros se consideran, como el valor que se les va a asignar, aplicando lógica y el \textit{sentido común} que se tiene por conocer como funciona el \textit{4 en línea}. El peso elegido para los parámetros es especialmente importante para obtener buenos resultados con un jugador goloso, pues la calidad de sus jugadas va a depender fuertemente de eso.
 
-Respecto a los parámetros elegidos en este Trabajo, es importante observar que se trató de igual manera las líneas horizontales, verticales y diagonales. Es decir, para el jugador es igual puntuar un cierto valor en línea horizontal, que uno en vertical; lo cual no necesariamente se corresponde con un escenario real, pues por ejemplo, en un \textit{4 en línea}, tres fichas alineadas verticalmente siempre pueden ser neutralizadas por el oponente. En cambio, si hay tres alineadas de manera horizontal, puede ocurrir que no sea posible bloquear todas las maneras de obtener cuatro fichas alineadas. La decisión de tratar a todas estas alternativas por igual fue tomada únicamente en pos de mayor simpleza en la implementación; sin embargo, sería interesante \textit{jugar} con los valores de los parámetros para plasmar efectivamente las diferencias que se mencionarion, e intentar observar si un jugador obtiene mejores resultados de esta manera.
+Respecto a los parámetros elegidos en este Trabajo, es importante observar que se trató de igual manera las líneas horizontales, verticales y diagonales. Es decir, para el jugador es igual puntuar un cierto valor en línea horizontal, que uno en vertical; lo cual no necesariamente se corresponde con un escenario real, pues por ejemplo, en un \textit{4 en línea}, tres fichas alineadas verticalmente siempre pueden ser neutralizadas por el oponente. En cambio, si hay tres alineadas de manera horizontal, puede ocurrir que no sea posible bloquear todas las maneras de obtener cuatro fichas alineadas. La decisión de tratar a todas estas alternativas por igual fue tomada únicamente en pos de mayor simpleza en la implementación; sin embargo, sería interesante \textit{jugar} con los valores de los parámetros para plasmar efectivamente las diferencias que se mencionaron, e intentar observar si un jugador obtiene mejores resultados de esta manera.
 
 En cuanto al \textit{grid-search}, queda como trabajo pendiente a futuro realizar una búsqueda local como las que se estudió en clase, para poder explorar muchos más valores para los diferentes parámetros, cosa que, por cuestiones de tiempo, no fue posible lograr.
 
