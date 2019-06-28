@@ -115,7 +115,7 @@
     
     Dichos parámetros serán posteriormente optimizados, utilizando dos técnicas distintas, que serán debidamente explicadas en secciones posteriores.
     \begin{itemize}
-        \item Una heurística de búsqueda local basada en \textit{grid-search}.
+        \item Una heurística basada en \textit{grid-search}.
         \item Una metaheurística basada en un algoritmo genético.
     \end{itemize}
     
@@ -507,7 +507,7 @@
 
     \subsection{Experimento 1: Enfrentamientos entre jugadores}
     
-    Como primera parte de la experimentación, se decidió tomar la idea planteada en el enunciado del Trabajo, que consiste en enfrentar a los jugadores implementados al jugador aleatorio provisto por la cátedra. Para eso, se definió un tablero arbitrario con $N=7$, $M=8$, $C=5$ y $p=(N*M)$, y se jugaron 2000 partidas de cada uno de los siguientes enfrentamientos (1000 empezando un jugador, y 1000 empezando el otro):
+    Como primera parte de la experimentación, se decidió tomar la idea planteada en el enunciado del Trabajo, que consiste en enfrentar a los jugadores implementados al jugador aleatorio provisto por la cátedra. Para eso, se definió un tablero de \textit{4 en línea} con $N=7$, $M=6$, $C=4$ y $p=21$, y se jugaron 2000 partidas de cada uno de los siguientes enfrentamientos (1000 empezando un jugador, y 1000 empezando el otro):
         \begin{enumerate}
             \item Jugador Goloso versus Jugador Aleatorio.
             \item Jugador Optimizado con Grid-search versus Jugador Aleatorio.
@@ -536,16 +536,16 @@
     
     Una vez descritos los jugadores en uso, se formulará la hipótesis propuesta para el experimento: los tres jugadores implementados ganarán al jugador aleatorio en más del $75\%$ de las partidas. Se elige este número para que se corresponda con lo pedido en el enunciado del Trabajo.
     
-    El experimento se realizará de la siguiente manera: se usa el juez implementado por la cátedra, donde uno de los jugadores siempre es \texttt{random\_player}, y el otro cambia según el caso entre \texttt{jugador.goloso}, \texttt{jugador.grid-search} y \texttt{jugador.genetico}. Se hará referencia como \textit{Ida} a las 1000 partidas en las que haya empezado jugando el jugador implementado, y \textit{Vuelta} a las 1000 en las que empezara el aleatorio. En las siguientes tablas, se mostrará cuántas partidas perdió, ganó y empató el jugador implementado (goloso, grid-search y genético, respectivamente):
+    El experimento se realizará de la siguiente manera: se usa el juez implementado por la cátedra, donde uno de los jugadores siempre es \texttt{random\_player}, y el otro cambia según el caso entre \texttt{jugador.goloso}, \texttt{jugador.grid-search} y \texttt{jugador.genetico}. Se hará referencia como \textit{Ida} a las 1000 partidas en las que haya empezado jugando el jugador implementado, y \textit{Vuelta} a las 1000 en las que empezara el aleatorio. En las siguientes tablas, se mostrará cuántas partidas perdió, ganó y empató el jugador implementado (goloso, grid-search y genético, respectivamente): \\[5pt]
 
     \underline{1. Goloso VS Aleatorio}:
     \begin{center}
 		\begin{tabular}{ | c || c | c | }
 		\hline
 		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
-		    Victoria &  998 &  983 \\ \hline
-		    Empate &  2 &  7 \\ \hline
-		    Derrota &  0 &  10 \\ \hline
+		    Victoria &  988 &  981 \\ \hline
+		    Empate &  1 &  0 \\ \hline
+		    Derrota &  11 &  19 \\ \hline
 		\end{tabular}
     \end{center}
     
@@ -554,9 +554,9 @@
 		\begin{tabular}{ | c || c | c | }
 		\hline
 		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
-		    Victoria &  994 &  984 \\ \hline
-		    Empate &  3 &  8 \\ \hline
-		    Derrota &  3 &  8 \\ \hline
+		    Victoria &  990 &  982 \\ \hline
+		    Empate &  1 &  1 \\ \hline
+		    Derrota &  9 &  17 \\ \hline
 		\end{tabular}
     \end{center}
     
@@ -565,9 +565,9 @@
 		\begin{tabular}{ | c || c | c | }
 		\hline
 		Resultado &  Ida &  Vuelta \\ \hhline{|=#=|=|}
-		    Victoria &  1000 &  969 \\ \hline
+		    Victoria &  989 &  871 \\ \hline
 		    Empate &  0 &  0 \\ \hline
-		    Derrota &  0 &  31 \\ \hline
+		    Derrota &  11 &  129 \\ \hline
 		\end{tabular}
     \end{center}
     
@@ -577,13 +577,13 @@
 		\begin{tabular}{ | c || c | c | c |}
 		\hline
 		Jugador &  Winrate - Ida &  Winrate - Vuelta &  Winrate - Total \\ \hhline{|=#=|=|=|}
-		    Goloso &  $99.8\%$ &  $98.3\%$ &  $99.05\%$ \\ \hline
-		    Grid-search &  $99.4\%$ &  $98.4\%$ &  $98.9\%$  \\ \hline
-		    Genético &  $100\%$ &  $96.9\%$ &  $98.45\%$ \\ \hline
+		    Goloso &  $98.8\%$ &  $98.1\%$ &  $98.45\%$ \\ \hline
+		    Grid-search &  $99\%$ &  $98.2\%$ &  $98.9\%$  \\ \hline
+		    Genético &  $98.9\%$ &  $87.1\%$ &  $93\%$ \\ \hline
 		\end{tabular}
     \end{center}
     
-    \underline{Análisis de los resultados}: para empezar, es claro que los tres jugadores implementados ganaron sus partidas en más del $75\%$ de las veces; por lo tanto, la hipótesis queda confirmada. Además de esto, se puede observar que el hecho de empezar la partida generó una ventaja no despreciable, sobre todo en el caso del algoritmo genético, donde el jugador ganó todas las partidas que empezó, pero fue el peor de los tres cuando empezó su rival. Por otro lado, el jugador goloso obtuvo la mayor proporción de victorias sobre las 2000 partidas, por lo que la intuición en cuanto a asignar valores a los parámetros fue muy efectiva, al menos para vencer a un jugador sin una estrategia fija como es el jugador aleatorio.
+    \underline{Análisis de los resultados}: para empezar, es claro que los tres jugadores implementados ganaron sus partidas en más del $75\%$ de las veces; por lo tanto, la hipótesis queda confirmada. Además de esto, se puede observar que el hecho de empezar la partida generó una ventaja no despreciable, sobre todo en el caso del algoritmo genético, donde el jugador ganó casi todas las partidas que empezó, pero fue el peor de los tres cuando empezó su rival. Por otro lado, el jugador goloso obtuvo y el jugador \textit{grid-search} obtuvieron una proporción de victorias muy similar sobre las 2000 partidas, por lo que la intuición en cuanto a asignar valores a los parámetros fue muy efectiva, al menos para vencer a un jugador sin una estrategia fija como es el jugador aleatorio.
     
     
     
@@ -610,7 +610,7 @@
                 
                 En dicha situación, si el azul llega a realizar esa jugada directa, en realidad el jugador rojo puede ganar, debido a que construirá un 3 en línea en el cual trivialmente hay 2 soluciones para ganar.
                 
-                Si miramos el jugador con la estrategia golosa predeterminada (archivo \texttt{goloso.cpp}), esta situación la defiende; sin embargo, al considerar los jugadores optimizados con \textit{grid-search} y algoritmo genético, éstos convergieron a configuraciones de parámetros en las cuales bloquear un $C-2$ no tiene alta prioridad, resultando en que puede surgir este tipo de escenario donde es derrotado. Este podría ser un motivo factible por el cual estos dos jugadores obtuvieron resultados ligeramente peores frente al jugador aleatorio en el Experimento 1 (en comparación al jugador Goloso).
+                Si miramos el jugador con la estrategia golosa predeterminada (archivo \texttt{goloso.cpp}), esta situación la defiende; sin embargo, al considerar el jugador optimizado con algoritmo genético, éste convergió a una configuración de parámetros en la cual bloquear un $C-2$ no tiene alta prioridad, resultando en que puede surgir este tipo de escenario donde es derrotado. Este podría ser un motivo factible por el cual este jugador obtuvo resultados ligeramente peores frente al jugador aleatorio en el Experimento 1 (en comparación al jugador Goloso).
                 
                 Para intentar solventar esto, podríá ser de utilidad reevaluar la función de \textit{fitness}; una buena idea sería armar jugadores triviales que siempre jueguen en este escenario, para que inmediatamente los jugadores que se estén optimizando se vean forzados a jugarlo bien, (o bien  tener un puntaje de \textit{fitness} pésimo, y ser consecuentemente descartados). Sin embargo, el alcance del Trabajo llegó hasta aquí, ya que aún queda más experimentación, y las posteriores conclusiones.
                 
@@ -645,9 +645,23 @@
 %----------------------------------------------------------------------------------------------------------
 
 
-\section{Conclusiones}
+\section{Conclusiones y trabajo futuro}
 
+Durante el desarrollo de este trabajo práctico, se consiguió realizar un acercamiento a técnicas heurísticas y metaheurísticas, para optimizar la elección de los valores asignados a los parámetros, en el contexto de la resolución de un juego de mesa clásico, utilizando una computadora. De todo esto, se pueden formular ciertas afirmaciones, comentarios y pensamientos finales, a los que se arribó luego de implementar los algoritmos, y \textit{mover} los parámetros analizando las consecuencias.
 
+Por ejemplo, es claro, después de analizar el desempeño de los jugadores implementados, que es de gran relevancia pensar detenidamente tanto qué parámetros se consideran, como el valor que se les va a asignar, aplicando lógica y el \textit{sentido común} que se tiene por conocer como funciona el \textit{4 en línea}. El peso elegido para los parámetros es especialmente importante para obtener buenos resultados con un jugador goloso, pues la calidad de sus jugadas va a depender fuertemente de eso.
+
+Respecto a los parámetros elegidos en este Trabajo, es importante observar que se trató de igual manera las líneas horizontales, verticales y diagonales. Es decir, para el jugador es igual puntuar un cierto valor en línea horizontal, que uno en vertical; lo cual no necesariamente se corresponde con un escenario real, pues por ejemplo, en un \textit{4 en línea}, tres fichas alineadas verticalmente siempre pueden ser neutralizadas por el oponente. En cambio, si hay tres alineadas de manera horizontal, puede ocurrir que no sea posible bloquear todas las maneras de obtener cuatro fichas alineadas. La decisión de tratar a todas estas alternativas por igual fue tomada únicamente en pos de mayor simpleza en la implementación; sin embargo, sería interesante \textit{jugar} con los valores de los parámetros para plasmar efectivamente las diferencias que se mencionarion, e intentar observar si un jugador obtiene mejores resultados de esta manera.
+
+En cuanto al \textit{grid-search}, queda como trabajo pendiente a futuro realizar una búsqueda local como las que se estudió en clase, para poder explorar muchos más valores para los diferentes parámetros, cosa que, por cuestiones de tiempo, no fue posible lograr.
+
+Este Trabajo también sirvió como punto de contacto con los algoritmos genéticos, hoy muy célebres debido al auge del \textit{machine learning}. En cuanto al algoritmo genético desarrollado, resulta de vital importancia dar con una buena función de \textit{fitness}, ya que es la que definirá, en mayor medida, el funcionamiento de la metaheurística; esto es así, pues, por ejemplo, puede darse la situación de haber elegido parámetros que representen bien la información que debe tener el algoritmo para ser exitoso, y aún así, si la función de \textit{fitness} definida no fue lo suficientemente \textit{buena}, puede terminar convergiendo a valores que no obtengan buenos resultados en la práctica. Asimismo, una mala elección de los parámetros incrementa la dificultad a la hora de evaluar la aptitud de los individuos.
+
+Siguiendo con el algoritmo genético, a la hora de definir \textit{crossovers} y \textit{mutaciones}, varias veces se ha dado la situación en que las generaciones de individuos venideras no son lo suficientemente \textit{inteligentes}, a pesar de haber seleccionado a los $k$ mejores ejemplares de la población para que se reproduzcan. Esto es, más allá de que los $k$ mejores sean incluidos en la siguiente generación, ocurrió a menudo que se generaron crías y mutaciones a partir de ellas, las cuales luego comenzaron a perder los enfrentamientos frecuentemente. La conclusión que se puede obtener de este escenario es que los valores de los parámetros convergieron demasiado rápido, lo que puede significar que las generaciones subsiguientes no sean muy \textit{buenas}.
+
+Por último, otro aspecto que influye considerablemente sobre la calidad de los resultados del algoritmo genético son las características de la población inicial. En el caso del algoritmo implementado, esta fue generada de una sola manera: aleatoriamente. Por esto, seguramente habría enriquecido la experimentación (y quizás también mejorado los resultados) el probar con otras formas de generar esta población inicial. Todas estas cuestiones mencionadas quedan pendientes como trabajo a ser realizado en un futuro.
+
+En resumen, y para concluir, este Trabajo fue útil en el sentido de que se exploraron maneras de resolver un problema que no son exactas, como sí lo eran las que se habían estado estudiando y utilizando hasta el momento. Por lo tanto, se podría afirmar que resultó exitoso en abrir las puertas a otras formas de implementar algoritmos, que además, tienen diversos usos en diferentes campos de esta disciplina.
 
 
 
